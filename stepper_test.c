@@ -11,7 +11,6 @@ PORTA drives stepper motor with:
 	A4 = I1
 	A5 = E1
 PORTD only requires HE sensor pin attached to pin D0
-
 */
 
 
@@ -19,8 +18,7 @@ PORTD only requires HE sensor pin attached to pin D0
 #include <stdlib.h>
 #include <util/delay_basic.h>
 #include <avr/interrupt.h>
-#include <util/delay.h>
-#include "lcd.h"
+//#include "lcd.h"
 #include <inttypes.h>
  
 
@@ -29,7 +27,22 @@ volatile int current_pos = 4;
 volatile int step_delay = 13; //global variable for i5s speed .
 int spin[4] = {0b11000000, 0b00011000, 0b10100000, 0b00010100};
 
-
+void mTimer(int count){
+	int i = 0;
+	//Set the Waveform Generation mode bit description to clear timer on compare math mode (CTC) only
+	TCCR1B |=_BV(WGM12);
+	OCR1A = 0x03e8; // sets the output compare register for 1000 cycles = 1ms
+	TCNT1 = 0x0000; //sets the initial value of the Timer Counter to 0x0000
+	TIMSK1 = TIMSK1 |0b00000010; // enables the output compare interrupt enable
+	TIFR1 |=_BV(OCF1A); // so it checks whether the values of the timer counter 1 and the data of OCR1A are the same
+	while(i < count){
+		if((TIFR1 & 0x02) == 0x02){
+			TIFR1 |=_BV(OCF1A); //clears the interrupt flag by writing one to a bit
+			i++;
+		}
+	}
+	return;
+}
 
 void StepperMotorCW (int steps){
 
@@ -85,11 +98,14 @@ ISR(INT0_vect) { // HE sensor is hooked up to PORTD0, will set current position 
 }
  
  int main()
+ {
  
-    	DDRC = 0xff; //set port c to output
+    DDRC = 0xff; //set port c to output
 	DDRD = 0x00; //set port d to input
 	DDRA = 0xff; //set port a to ouput
 
+	TCCR1B |=_BV(CS10);
+	
 	sei(); // sets the Global Enable for all interrupts
 
    //initialize the stepper to get it to the starting position
