@@ -1,0 +1,51 @@
+volatile unsigned  int state;
+
+void read_button(){
+	if((PINA & 0b00000000) == 0b00000000){ //button pressed
+		mTimer(20);
+		state = 0;
+	}
+	if((PINA & 0b00000001) == 0b00000001){ //button not pressed
+		mTimer(20);
+		state = 1;
+	}
+}
+
+IN MAIN LOOP:
+read_button(); //Do we want this to be a read function or can we make it an interrupt?
+		//all this next stuff needs to be in the “PAUSE” state
+if (state == 0){
+PORTB = 0b00000000;	//DC motor STOP
+PORTB = 0b00001100; 	//DC motor OFF
+//stepper motor off?
+
+	//LCD displays number of sorted and pending items
+
+//BIG QUESTION: DOES LOOP KEEP RUNNING @ MTIMER OR EVERYTHING STOP?
+	while (read_button()){
+
+	//THIS FIRST PART IS SORTED ITEMS FROM WHEREVER WE STORE THEM
+
+LCDWriteStringXY(0, 0, “P = Pending”);
+LCDWriteStringXY(0, 1, “S = Sorted”);
+		mTimer(1000);
+
+LCDWriteStringXY(0, 0, “BL: WH: ST: AL: ”);
+	LCDWriteStringXY(0, 1, “S   S   S   S   S   ”);
+	LCDWriteIntXY(1,1,*NUM_BL*, 2);
+	LCDWriteIntXY(1,5,*NUM_WH*, 2);
+	LCDWriteIntXY(1,9,*NUM_ST*, 2);
+	LCDWriteIntXY(1,13,*NUM_AL*, 2);
+		mTimer(3000);
+
+	//THIS NEXT PART IS PENDING ITEMS FROM LINKED LIST	
+LCDWriteStringXY(0, 0, “BL: WH: ST: AL: ”);
+	LCDWriteStringXY(0, 1, “P   P   P   P   P   ”);
+	LCDWriteIntXY(1,1,*NUM_BLP*, 2);
+	LCDWriteIntXY(1,5,*NUM_WHP*, 2);
+	LCDWriteIntXY(1,9,*NUM_STP*, 2);
+	LCDWriteIntXY(1,13,*NUM_ALP*, 2);
+		mTimer(3000);
+
+}
+
