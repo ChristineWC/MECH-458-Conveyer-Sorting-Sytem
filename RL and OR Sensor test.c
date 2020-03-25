@@ -107,6 +107,7 @@ void mTimer(int count){
 
 int main()
 {
+    DDRD = 0x00; // for the interrupts for the sensors
     DDRC = 0xff; // for the leds
     DDRB = 0xff; // for the dc motor
     TCCR1B |=_BV(CS10);
