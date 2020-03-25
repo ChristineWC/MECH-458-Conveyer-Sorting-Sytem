@@ -88,6 +88,9 @@ ISR(INT0_vect) { // HE sensor is hooked up to PORTD0, will set current position 
  
     	DDRC = 0xff; //set port c to output
 	DDRD = 0x00; //set port d to input
+	DDRA = 0xff; //set port a to ouput
+
+	sei(); // sets the Global Enable for all interrupts
 
    //initialize the stepper to get it to the starting position
    while (current_pos != 0){
