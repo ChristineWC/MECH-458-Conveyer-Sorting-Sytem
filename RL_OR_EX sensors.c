@@ -5,6 +5,8 @@ It would look like the follow code:
 List* list = new_list();
 Therefore the ISR for ADC_vect corresponds to those assumptions
 
+(also we would only be able to use the destroy function and not delete list function that way we don't need to keep making a new list)
+
 */
 
 #include <avr/io.h>
