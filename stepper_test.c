@@ -1,5 +1,20 @@
 //STEPPER MOTOR W/ RAMP FUNCTION TEST
 
+/*
+WIRING SETUP:
+PORTC is hooked up to LEDs as usual in all labs to this point
+PORTA drives stepper motor with:
+	A0 = I4
+	A1 = I3
+	A2 = E2
+	A3 = I2
+	A4 = I1
+	A5 = E1
+PORTD only requires HE sensor pin attached to pin D0
+
+*/
+
+
 #include <avr/io.h>
 #include <stdlib.h>
 #include <util/delay_basic.h>
@@ -71,7 +86,8 @@ ISR(INT0_vect) { // HE sensor is hooked up to PORTD0, will set current position 
  
  int main()
  
-    DDRC = 0xff; //set port c to output
+    	DDRC = 0xff; //set port c to output
+	DDRD = 0x00; //set port d to input
 
    //initialize the stepper to get it to the starting position
    while (current_pos != 0){
