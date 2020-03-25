@@ -8,8 +8,7 @@ The purpose of this test is to determine what information I am gathering and whe
 #include <avr/interrupt.h>
 
 volatile unsigned int ADC_result;
-
-unsigned int lowest; 
+volatile unsigned int lowest; 
 int material; 
 int result_flag = 0; 
 
