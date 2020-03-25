@@ -114,10 +114,11 @@ int main()
     init_ADC();
 
     PWM(); 
+    
     sei(); 
     while(result_flag != 1)
     {
-        PORTB = 0b00001000; // Hopefully this will run the DC motor at 50 percent because the duty cycle is set to 50 percent earlier
+        PORTB = 0b00001000;
     }
     
     PORTB = 0b00000000;
