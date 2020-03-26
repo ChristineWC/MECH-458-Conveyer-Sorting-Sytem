@@ -17,14 +17,14 @@ Therefore the ISR for ADC_vect corresponds to those assumptions
 volatile unsigned int ADC_result;
 
 unsigned int lowest; 
-const int Al_Max = 202;
-const int Al_Min = 50; 
-const int St_Max = 570;
-const int St_Min = 411;
-const int Bl_Max = 984;
-const int Bl_Min = 972;
-const int Wh_Max = 966;
-const int Wh_Min = 942;
+const int Al_Max = 350;
+const int Al_Min = 0; 
+const int St_Max = 699;
+const int St_Min = 351;
+const int Bl_Max = 1023;
+const int Bl_Min = 941;
+const int Wh_Max = 940;
+const int Wh_Min = 700;
 
 ISR(ADC_vect)
 {
