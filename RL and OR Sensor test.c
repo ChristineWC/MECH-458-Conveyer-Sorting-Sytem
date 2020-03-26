@@ -1,7 +1,10 @@
 /*
-The purpose of this test is to determine what information is gathered and whether it is being gathered the right way
+Tal_Christine RL and OR sensor Test.c
+The purpose of this test is to test the functionality of the sensors with this code
+Wiring setup:
 RL sensor goes to F0, OR sensor goes to D2
 The DC motor should be as follows: DC Motor B7 to PWM, B3 to EA, B2 to EB, B1 to IA, B0 to IB
+Alu = 0 ->350, Ste = 351 ->699, Wht = 700 -> 940, Blk = 941 - 1023
 */
 
 #include <avr/io.h>
@@ -15,14 +18,14 @@ unsigned int lowest;
 int material; 
 int result_flag = 0; 
 
-const int Al_Max = 202;
-const int Al_Min = 50; 
-const int St_Max = 570;
-const int St_Min = 411;
-const int Bl_Max = 984;
-const int Bl_Min = 972;
-const int Wh_Max = 966;
-const int Wh_Min = 942;
+const int Al_Max = 350;
+const int Al_Min = 0; 
+const int St_Max = 699;
+const int St_Min = 351;
+const int Bl_Max = 1023;
+const int Bl_Min = 941;
+const int Wh_Max = 940;
+const int Wh_Min = 700;
 
 ISR(ADC_vect)
 {
@@ -110,13 +113,13 @@ int main()
     DDRD = 0x00; // for the interrupts for the sensors
     DDRC = 0xff; // for the leds
     DDRB = 0xff; // for the dc motor
+	
     TCCR1B |=_BV(CS10);
     init_ADC();
-
     PWM(); 
-    
     sei(); 
-    while(result_flag != 1)
+	
+    while(result_flag != 1) // so it runs the dc motor until the piece has gone past the sensors and the type of material has been decided
     {
         PORTB = 0b00001000;
     }
@@ -144,18 +147,17 @@ int main()
         PORTC = 0b11111111; 
     }
 
-    //just in case it is reading the wrong materials you would just need to comment out the if statments and else if statments above 
+    //just in case it is reading the wrong materials you would just need to comment out the if statements and else if statements above 
     //and uncomment the code below:
     /*
     int high = lowest & 0b110000000; 
     int low = lowest & 0b0011111111;
-
     PORTC = high;
     mTimer(1000);
     PORTC = low; 
-
     */
 
     
 
 }
+
