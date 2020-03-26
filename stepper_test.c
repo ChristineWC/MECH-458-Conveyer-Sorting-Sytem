@@ -25,7 +25,8 @@ PORTD only requires HE sensor pin attached to pin D0
 volatile int current_step = 0;
 volatile int current_pos = 4;
 volatile int step_delay = 13; //global variable for i5s speed .
-int spin[4] = {0b11000000, 0b00011000, 0b10100000, 0b00010100};
+//int spin[4] = {0b11000000, 0b00011000, 0b10100000, 0b00010100};
+int spin[4] = {0b00110000, 0b00000110, 0b00101000, 0b00000101};
 
 void mTimer(int count){
 	int i = 0;
