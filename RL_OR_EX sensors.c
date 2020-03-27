@@ -14,8 +14,6 @@ Therefore the ISR for ADC_vect corresponds to those assumptions
 #include <util/delay_basic.h>
 #include <avr/interrupt.h>
 
-volatile unsigned int ADC_result;
-
 unsigned int lowest; 
 const int Al_Max = 350;
 const int Al_Min = 0; 
@@ -28,11 +26,9 @@ const int Wh_Min = 700;
 
 ISR(ADC_vect)
 {
-    ADC_result = (ADC & 0x3ff); // This is to get the 10 bit part of it
-    
-    if(ADC_result < lowest)
+    if(ADC < lowest) 
     {
-        lowest = ADC_result; 
+        lowest = ADC;
     }
 
     if( (PIND & 0x04 ) == 0x04) // if the item is still in front of the OR sensor 
@@ -96,7 +92,31 @@ void init_ADC ()
     EICRA |= (_BV(ISC21) | _BV(ISC20)); // rising edge interrupt
     ADCSRA |= _BV(ADEN); // enable ADC
     ADCSRA |= _BV(ADIE); // enable interrupt of ADC
-    ADMUX |= _BV(ADLAR) | _BV(REFS0); 
-    //ADC Multiplexer selection register bits 5 and 6 set to 1, ADLAR = ADC left adjust result; REFS0 set to 1 which selects voltage reference selection to core voltage (3.3v)
+    ADMUX |= _BV(MUX0) | _BV(REFS0);  
 }
+
+void PWM (){
+    TCCR0A |= 0b10000011; //first bit sets compare match output mode to clear, last two set whole thing to mode 3 (table 13-7)
+    TCCR0B |= 0b00000010; //sets clock prescale to 1/8 (Page 114)
+    OCR0A |= 0b01100000; //sets duty cycle to 1/2 
+}
+
+
+void mTimer(int count){
+    int i = 0;
+    //Set the Waveform Generation mode bit description to clear timer on compare math mode (CTC) only
+    TCCR1B |=_BV(WGM12);
+    OCR1A = 0x03e8; // sets the output compare register for 1000 cycles = 1ms
+    TCNT1 = 0x0000; //sets the initial value of the Timer Counter to 0x0000
+    TIFR1 |=_BV(OCF1A); // so it checks whether the values of the timer counter 1 and the data of OCR1A are the same
+    while(i < count){
+        if((TIFR1 & 0x02) == 0x02){
+            TIFR1 |=_BV(OCF1A); //clears the interrupt flag by writing one to a bit
+            i++;
+        }
+    }
+    return;
+}
+
+
 
