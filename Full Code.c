@@ -9,6 +9,8 @@
 #include "list.h"
 
 //Global variables
+State current_state;
+
 volatile int current_step = 0;
 volatile int step_delay = 13; //global variable for i5s speed .
 volatile int current_pos = 0;
@@ -183,6 +185,8 @@ void PWM (){
 
 ISR(ADC_vect) //ISR for reflective sensor when ADC conversion complete 
 {
+    current_state = READ_IN_INT;
+	
     if(ADC < lowest) 
     {
         lowest = ADC;
