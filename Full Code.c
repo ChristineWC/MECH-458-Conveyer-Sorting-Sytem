@@ -227,7 +227,27 @@ ISR(INT2_vect) // OR sensor
 
 ISR(INT3_vect)// EX sensor, it is hooked up to PORT D3
 {
-    /*Depends on what we want it to do when the piece first triggers the sensor
+	PORTB = 0b00000000;    // this is Brake Vcc
+	Item* it = list->head;
+	Material mat = it->material;
+	if(mat == STEEL)
+	{
+		steel_count++; 
+	}
+	else if(mat == ALUMINUM)
+	{
+		aluminum_count++;	
+	}
+	else if(mat == BLACK)
+	{
+		black_count++;	
+	}
+	else if(mat == WHITE)
+	{
+		white_count++; 
+	}
+	//trigger stepper motor state
+    /*
     if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor 
     if((PIND &= 0x08) == 0x00)// this means that there is nothing in front of the exit sensor
     */
