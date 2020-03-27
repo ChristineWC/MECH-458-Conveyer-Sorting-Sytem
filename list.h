@@ -14,7 +14,7 @@ typedef enum
 {
     NONE      = 0,
     STEEL     = 1,
-    ALUMINIUM = 2,
+    ALUMINUM = 2,
     BLACK     = 3,
     WHITE     = 4
 } Material;
