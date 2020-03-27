@@ -227,9 +227,12 @@ ISR(INT2_vect) // OR sensor
 
 ISR(INT3_vect)// EX sensor, it is hooked up to PORT D3
 {
+	current_state = EXIT_PREP_INT; 
+	
 	PORTB = 0b00000000;    // this is Brake Vcc
 	Item* it = list->head;
 	Material mat = it->material;
+	
 	if(mat == STEEL)
 	{
 		steel_count++; 
