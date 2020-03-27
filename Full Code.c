@@ -212,7 +212,7 @@ ISR(ADC_vect) //ISR for reflective sensor when ADC conversion complete
         }
         else if(lowest <= Al_Max && lowest >= Al_Min)
         {
-            list->push_back(list, ALUMINIUM);
+            list->push_back(list, ALUMINUM);
         }
     }
 }
