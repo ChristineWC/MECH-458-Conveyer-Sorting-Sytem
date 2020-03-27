@@ -2,7 +2,7 @@
 Tal_Christine RL and OR sensor Test.c
 The purpose of this test is to test the functionality of the sensors with this code
 Wiring setup:
-RL sensor goes to F0, OR sensor goes to D2
+RL sensor goes to F1 (cannot be F0 or F3 because they have temp sensors on them), OR sensor goes to D2
 The DC motor should be as follows: DC Motor B7 to PWM, B3 to EA, B2 to EB, B1 to IA, B0 to IB
 Alu = 0 ->350, Ste = 351 ->699, Wht = 700 -> 940, Blk = 941 - 1023
 */
