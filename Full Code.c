@@ -246,7 +246,15 @@ int main(){
     PWM(); //Though the duty cycle may need to be changed for the DC motor
     sei(); 
 
-    
+    while()
+    {
+	PORTB = 0b00000010;		// DC motor forward (CCW)      
+    }
+	
+	
+	    
+	    
+	
     
 
 }
