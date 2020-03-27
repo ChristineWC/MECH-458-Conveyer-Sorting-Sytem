@@ -105,6 +105,7 @@ int main()
     DDRD = 0x00; // for the interrupts for the sensors
     DDRC = 0xff; // for the leds
     DDRB = 0xff; // for the dc motor
+    //DDRF = 0x00; // input from ADC
 	
     TCCR1B |=_BV(CS10);
     init_ADC();
