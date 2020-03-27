@@ -12,8 +12,6 @@ Alu = 0 ->350, Ste = 351 ->699, Wht = 700 -> 940, Blk = 941 - 1023
 #include <util/delay_basic.h>
 #include <avr/interrupt.h>
 
-volatile unsigned int ADC_result;
-
 unsigned int lowest; 
 int material; 
 int result_flag = 0; 
@@ -29,11 +27,9 @@ const int Wh_Min = 700;
 
 ISR(ADC_vect)
 {
-    ADC_result = (ADC & 0x3ff); // This is to get the 10 bit part of it
-    
-    if(ADC_result < lowest)
+    if(ADC < lowest) 
     {
-        lowest = ADC_result; 
+        lowest = ADC;
     }
 
     if( (PIND & 0x04 ) == 0x04) // if the item is still in front of the OR sensor 
@@ -79,16 +75,13 @@ void init_ADC ()
     EICRA |= (_BV(ISC21) | _BV(ISC20)); // rising edge interrupt
     ADCSRA |= _BV(ADEN); // enable ADC
     ADCSRA |= _BV(ADIE); // enable interrupt of ADC
-    ADMUX |= _BV(ADLAR) | _BV(REFS0); 
-    //ADC Multiplexer selection register bits 5 and 6 set to 1, ADLAR = ADC left adjust result; REFS0 set to 1 which selects voltage reference selection to core voltage (3.3v)
+    ADMUX |= _BV(MUX0) | _BV(REFS0);  
 }
 
 void PWM (){
-    DDRB |= 0b10000000; //sets bit 7 of ddrb to output
     TCCR0A |= 0b10000011; //first bit sets compare match output mode to clear, last two set whole thing to mode 3 (table 13-7)
-    TIMSK0 |= 0b00000010; //enables output compare match A interrupt
     TCCR0B |= 0b00000010; //sets clock prescale to 1/8 (Page 114)
-    OCR0A |= 0b10000000; //sets duty cycle to 1/2
+    OCR0A |= 0b01100000; //sets duty cycle to 1/2 
 }
 
 void mTimer(int count){
@@ -97,7 +90,6 @@ void mTimer(int count){
     TCCR1B |=_BV(WGM12);
     OCR1A = 0x03e8; // sets the output compare register for 1000 cycles = 1ms
     TCNT1 = 0x0000; //sets the initial value of the Timer Counter to 0x0000
-    TIMSK1 = TIMSK1 |0b00000010; // enables the output compare interrupt enable
     TIFR1 |=_BV(OCF1A); // so it checks whether the values of the timer counter 1 and the data of OCR1A are the same
     while(i < count){
         if((TIFR1 & 0x02) == 0x02){
@@ -119,15 +111,13 @@ int main()
     PWM(); 
     sei(); 
 	
-    while(result_flag != 1) // so it runs the dc motor until the piece has gone past the sensors and the type of material has been decided
+    while(result_flag != 1) 
     {
-        PORTB = 0b00001000;
+	PORTB = 0b00000010;		// DC motor forward (CCW)
     }
     
-    PORTB = 0b00000000;
-    PORTB = 0b00001100;        
-    
-
+    PORTB = 0b00000000;    // this is Brake Vcc
+ 
     mTimer(1000); 
 
     if (material == 0)
@@ -146,17 +136,6 @@ int main()
     {
         PORTC = 0b11111111; 
     }
-
-    //just in case it is reading the wrong materials you would just need to comment out the if statements and else if statements above 
-    //and uncomment the code below:
-    /*
-    int high = lowest & 0b110000000; 
-    int low = lowest & 0b0011111111;
-    PORTC = high;
-    mTimer(1000);
-    PORTC = low; 
-    */
-
     
 
 }
