@@ -68,3 +68,63 @@ So I'm not exactly sure if this is what you were thinking but I made this:
   
 	//trigger no action state
   
+  
+  
+  //=====================================================================================
+  
+  //Okay, that all looks about right. I'll write up a bit of a state machine below and you can let me know what you think
+  
+  //in main, after the "initialize" section. 
+  
+  //possible states will be "RUNNING" , "BUCKET" , "PAUSE"
+  //needs global variable "volatile int last_state" set in interrupts
+  
+  goto RUNNING;
+  
+  RUNNING:
+	  //output to lcd that it's running normally
+	  //turn on the dc motor to run belt
+
+	  switch(State){
+	  	case(0):
+			goto RUNNING; //basically looping this stuff
+			break;
+		case(1):
+			goto BUCKET; //triggered by EOT interrupt
+			break;
+		case(2):
+			goto PAUSE; //triggered by pause interrupt
+			break;
+		case(3):
+			goto X;
+			break;
+		case(4):
+			goto Y;
+			break;
+	  } // Changes states, otherwise keeps running belt
+  
+  BUCKET:
+  	//lcd output that we in the bucket state
+	//add stepper motor code here
+  	
+  	State = 0;
+	goto RUNNING;
+  	
+  PAUSE:
+  	//lcd output that we in the pause state
+	//lcd output the right things
+	
+	if (last_state == 1)
+		goto BUCKET;
+	else()
+		goto RUNNING;
+  
+  
+  /*so this still needs a lot. we need to include all the relevant code
+  for each state, as well as all the initialization stuff. I don't think 
+  we need a state for reading in from the RL, because that happens alongside 
+  the RUNNING state, and is entirely handled by interrupts. so are all the 
+  "State" variable changes. So once we have all the interrupts set up 
+  and all the code for each state in here, it **should** work?
+  
+  
