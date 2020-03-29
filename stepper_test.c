@@ -48,7 +48,7 @@ void mTimer(int count){
 
 void StepperMotorCW (int steps){
 
-	for(int i = 0; i < steps; i++){
+	for(int i = 1; i <= steps; i++){
 		if(current_step == 3)
 		current_step = 0;
 		else
@@ -60,13 +60,15 @@ void StepperMotorCW (int steps){
 		step_delay--;
 		if ((i%2 == 0) && (i >= (steps*4/5)))
 		step_delay++;
+		if (i%50 == 0)
+		current_pos++;
 	}
 	step_delay = 18;
 }
 
 void StepperMotorCCW (int steps){
 	
-	for(int i = 0; i < steps; i++){
+	for(int i = 1; i <= steps; i++){
 		if(current_step == 0)
 		current_step = 3;
 		else
@@ -78,6 +80,9 @@ void StepperMotorCCW (int steps){
 		step_delay--;
 		if ((i%2 == 0) && (i >= (steps*4/5)))
 		step_delay++;
+		if (i%50 == 0)
+		current_pos--;
+
 	}
 	step_delay = 18;
 }
