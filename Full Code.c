@@ -336,6 +336,7 @@ int main(){
     DDRF = 0x00; //input for RL sensor @ F1
     List* list = new_list();
     
+    LCDInit(LS_BLINK|LS_ULINE); //initialize LCD subsystem
     TCCR1B |=_BV(CS10); // we need this in main to use the timer
     init_int(); //initializes all interrupts
     PWM(); //Though the duty cycle may need to be changed for the DC motor
