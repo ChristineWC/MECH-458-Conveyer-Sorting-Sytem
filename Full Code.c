@@ -317,6 +317,9 @@ ISR(INT0_vect) { // HE sensor is hooked up to PORTD0, will set current position 
 	current_pos = 0;
 }
 
+ISR(INT1_vect) { //pause button hooked up to D1
+	//put here whatever the pause button ISR code would be	
+}
 
 
 int main(){
