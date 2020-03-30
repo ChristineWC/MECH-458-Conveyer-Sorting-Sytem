@@ -325,6 +325,7 @@ int main(){
     DDRB = 0xff; // for the dc motor
     DDRC = 0xff; // output for the LCD
     DDRA = 0xff; //output for stepper
+    DDRF = 0x00; //input for RL sensor @ F1
     List* list = new_list();
     
     TCCR1B |=_BV(CS10); // we need this in main to use the timer
