@@ -164,7 +164,7 @@ void mTimer(int count){
     return;
 }
 
-void init_ADC () 
+void init_int() //enables all necessary interrupts
 {
     // config the external interrupt ======================================
     EIMSK |= (_BV(INT2)); // enable INT2
@@ -172,6 +172,10 @@ void init_ADC ()
     ADCSRA |= _BV(ADEN); // enable ADC
     ADCSRA |= _BV(ADIE); // enable interrupt of ADC
     ADMUX |= _BV(MUX0) | _BV(REFS0);  
+    EICRA |= _BV(ISC01);   // Falling Edge on INT0 for hall sensor
+    EIMSK |= _BV(INT0);    // Enable INT0
+    EIMSK |= _BV(INT3); //Enable INT3	
+    EICRA |= (_BV(ISC31) | _BV(ISC30)); // rising edge
 }
 
 void PWM (){
@@ -332,9 +336,7 @@ int main(){
     List* list = new_list();
     
     TCCR1B |=_BV(CS10); // we need this in main to use the timer
-    EICRA |= _BV(ISC01);   // Falling Edge on INT0 for hall sensor
-    EIMSK |= _BV(INT0);    // Enable INT0
-    init_ADC();
+    init_int();
     PWM(); //Though the duty cycle may need to be changed for the DC motor
     sei(); // sets the Global Enable for all interrupts
 
