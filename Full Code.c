@@ -171,7 +171,8 @@ void init_int() //enables all necessary interrupts
     EICRA |= (_BV(ISC21) | _BV(ISC20)); // rising edge interrupt for OR sensor
     ADCSRA |= _BV(ADEN); // enable ADC
     ADCSRA |= _BV(ADIE); // enable interrupt of ADC
-    ADMUX |= _BV(MUX0) | _BV(REFS0);  
+    ADMUX |= _BV(MUX0) | _BV(REFS0); //ADC Multiplexer selection register bits 5 and 6 set to 1, ADLAR = ADC left adjust result; 
+    //REFS0 set to 1 which selects voltage reference selection to core voltage (3.3v) 
     EICRA |= _BV(ISC01);   // Falling Edge on INT0 for hall sensor
     EIMSK |= _BV(INT0);    // Enable INT0 for hall sensor
     EIMSK |= _BV(INT3); //Enable INT3 for EOT sensor	
