@@ -167,15 +167,15 @@ void mTimer(int count){
 void init_int() //enables all necessary interrupts
 {
     // config the external interrupt ======================================
-    EIMSK |= (_BV(INT2)); // enable INT2
-    EICRA |= (_BV(ISC21) | _BV(ISC20)); // rising edge interrupt
+    EIMSK |= (_BV(INT2)); // enable INT2 for OR sensor
+    EICRA |= (_BV(ISC21) | _BV(ISC20)); // rising edge interrupt for OR sensor
     ADCSRA |= _BV(ADEN); // enable ADC
     ADCSRA |= _BV(ADIE); // enable interrupt of ADC
     ADMUX |= _BV(MUX0) | _BV(REFS0);  
     EICRA |= _BV(ISC01);   // Falling Edge on INT0 for hall sensor
-    EIMSK |= _BV(INT0);    // Enable INT0
-    EIMSK |= _BV(INT3); //Enable INT3	
-    EICRA |= (_BV(ISC31) | _BV(ISC30)); // rising edge
+    EIMSK |= _BV(INT0);    // Enable INT0 for hall sensor
+    EIMSK |= _BV(INT3); //Enable INT3 for EOT sensor	
+    EICRA |= (_BV(ISC31) | _BV(ISC30)); // rising edge interrupt for EOT sensor
 }
 
 void PWM (){
