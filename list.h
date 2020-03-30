@@ -19,16 +19,6 @@ typedef enum
     WHITE     = 4
 } Material;
 
-typedef enum
-{
-   READ_IN_INT = 0,
-   EXIT_PREP_INT = 1,
-   STEPPER_MOTOR = 2,
-   DUMP = 3,
-   SYSTEM_PAUSE = 4,
-   RAMP_DOWN = 5
-} State;
-
 typedef struct item_t
 {
     Material material;
