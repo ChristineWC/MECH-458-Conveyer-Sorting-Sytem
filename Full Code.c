@@ -11,14 +11,16 @@
 //Global variables
 State current_state;
 
-volatile int current_step = 0;
-volatile int step_delay = 13; //global variable for i5s speed .
+volatile int current_step = 4;
+volatile int step_delay = 18; //global variable for i5s speed .
 volatile int current_pos = 0;
 
 int steel_count = 0; 
 int aluminum_count = 0; 
 int black_count = 0; 
 int white_count = 0; 
+
+int spin[4] = {0b00110000, 0b00000110, 0b00101000, 0b00000101};
 
 unsigned int lowest;
 int ADC_resultflag = 0; 
@@ -178,6 +180,59 @@ void PWM (){
     OCR0A |= 0b01100000; //sets duty cycle to 1/2 
 }
 
+void StepperMotorCW (int steps){
+
+	for(int i = 1; i <= steps; i++){
+		if(current_step == 3)
+		current_step = 0;
+		else
+		current_step++;
+		PORTA = spin[current_step];
+		mTimer(step_delay);
+
+		if ((i%2 == 0) && (i <= (steps/4)))
+		step_delay--;
+		if ((i%2 == 0) && (i >= (steps*4/5)))
+		step_delay++;
+		if (i%50 == 0)
+		current_pos++;
+	}
+	step_delay = 18;
+}
+
+void StepperMotorCCW (int steps){
+	
+	for(int i = 1; i <= steps; i++){
+		if(current_step == 0)
+		current_step = 3;
+		else
+		current_step--;
+		PORTA = spin[current_step];
+		mTimer(step_delay);
+		
+		if ((i%2 == 0) && (i <= (steps/4)))
+		step_delay--;
+		if ((i%2 == 0) && (i >= (steps*4/5)))
+		step_delay++;
+		if (i%50 == 0)
+		current_pos--;
+
+	}
+	step_delay = 18;
+}
+
+
+void Stepper(int to_be_sorted_to){ // CALL THIS IN MAIN LOOP IN SORTING STATE
+	unsigned int dist = (to_be_sorted_to - current_pos)*50;
+	if (dist == 150)
+	StepperMotorCCW(50);
+	if (dist == -150)
+	StepperMotorCW (50);
+	else if (dist < 0)
+	StepperMotorCCW (-dist);
+	else if (dist > 0)
+	StepperMotorCW (dist);
+}
 
 
 
@@ -258,21 +313,34 @@ ISR(INT3_vect)// EX sensor, it is hooked up to PORT D3
 
 
 
+ISR(INT0_vect) { // HE sensor is hooked up to PORTD0, will set current position to 0 every time HE sensor is triggered
+	current_pos = 0;
+}
+
+
 
 int main(){
-
+//initialization
     DDRD = 0x00; // for the interrupts for the sensors
     DDRB = 0xff; // for the dc motor
     DDRC = 0xff; // output for the LCD
-    
+    DDRA = 0xff; //output for stepper
     List* list = new_list();
     
     TCCR1B |=_BV(CS10); // we need this in main to use the timer
-
+    EICRA |= _BV(ISC01);   // Falling Edge on INT0 for hall sensor
+    EIMSK |= _BV(INT0);    // Enable INT0
     init_ADC();
     PWM(); //Though the duty cycle may need to be changed for the DC motor
-    sei(); 
+    sei(); // sets the Global Enable for all interrupts
 
+	
+//initialize the stepper to get it to the starting position
+	while (current_pos != 0){
+		StepperMotorCW(1);
+	}
+	
+	//loop stuff starts
     while()
     {
 	PORTB = 0b00000010;		// DC motor forward (CCW)      
