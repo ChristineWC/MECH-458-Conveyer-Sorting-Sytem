@@ -337,7 +337,7 @@ int main(){
     List* list = new_list();
     
     TCCR1B |=_BV(CS10); // we need this in main to use the timer
-    init_int();
+    init_int(); //initializes all interrupts
     PWM(); //Though the duty cycle may need to be changed for the DC motor
     sei(); // sets the Global Enable for all interrupts
 
@@ -348,6 +348,48 @@ int main(){
 	}
 	
 	//loop stuff starts
+	
+	//needs global variable "volatile int last_state" set in interrupts
+  
+  goto RUNNING;
+  
+  RUNNING:
+	  //output to lcd that it's running normally
+	  //turn on the dc motor to run belt
+
+	  switch(State){
+	  	case(0):
+			goto RUNNING; //basically looping this stuff
+			break;
+		case(1):
+			goto BUCKET; //triggered by EOT interrupt
+			break;
+		case(2):
+			goto PAUSE; //triggered by pause interrupt
+			break;
+		case(3):
+			goto X;
+			break;
+		case(4):
+			goto Y;
+			break;
+	  } // Changes states, otherwise keeps running belt
+  
+  BUCKET:
+  	//lcd output that we in the bucket state
+	//add stepper motor code here
+  	
+  	State = 0;
+	goto RUNNING;
+  	
+  PAUSE:
+  	//lcd output that we in the pause state
+	//lcd output the right things
+	
+	if (last_state == 1)
+		goto BUCKET;
+	else()
+		goto RUNNING;
     while()
     {
 	PORTB = 0b00000010;		// DC motor forward (CCW)      
