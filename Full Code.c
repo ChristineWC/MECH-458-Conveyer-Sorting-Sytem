@@ -323,7 +323,9 @@ ISR(INT0_vect) { // HE sensor is hooked up to PORTD0, will set current position 
 }
 
 ISR(INT1_vect) { //pause button hooked up to D1
-	//put here whatever the pause button ISR code would be	
+	//put here whatever the pause button ISR code would be
+	last_state = State
+	goto PAUSE;
 }
 
 
@@ -357,6 +359,7 @@ int main(){
   RUNNING:
 	  //output to lcd that it's running normally
 	  //turn on the dc motor to run belt
+	PORTB = 0b00000010;		// DC motor forward (CCW)      
 
 	  switch(State){
 	  	case(0):
@@ -368,17 +371,14 @@ int main(){
 		case(2):
 			goto PAUSE; //triggered by pause interrupt
 			break;
-		case(3):
-			goto X;
-			break;
-		case(4):
-			goto Y;
-			break;
+
 	  } // Changes states, otherwise keeps running belt
   
   BUCKET:
   	//lcd output that we in the bucket state
 	//add stepper motor code here
+	
+	Stepper(list.color); //This needs to take in the bin number that the object needs to dump into
   	
   	State = 0;
 	goto RUNNING;
