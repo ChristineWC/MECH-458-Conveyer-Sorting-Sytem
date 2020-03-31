@@ -12,11 +12,10 @@ a compiler error. With those in place the complier will just ignore the header i
 //Using an enum just makes things easier so that we don't need to memorize which numbers correspond to which material and we can just use them (for examples see main)
 typedef enum
 {
-    NONE      = 0,
-    STEEL     = 1,
-    ALUMINUM = 2,
-    BLACK     = 3,
-    WHITE     = 4
+    BLACK    = 0,
+    STEEL    = 50,
+    WHITE    = 100,
+    ALUMINUM = 150
 } Material;
 
 typedef struct item_t
