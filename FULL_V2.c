@@ -222,11 +222,11 @@ void StepperGo(){
 	current_pos += (dist)/ abs(dist);
 }
 void step_what(){ //sets the distance and speed 
-	dist = (current_pos - list->head->material);
+	dist = (list->head->material - current_pos);
 	if (dist >= 100)
-		dist = 100 - dist; 
+		dist = dist - 200; 
 	if (dist <= -100)
-		dist = -200 - dist; 
+		dist = dist + 200; 
 	
 	//how far to go? set "acc_or_dec" based on current distance and step_delay
 	if (abs(dist) > 20 && (step_delay > 9) && (dist%2 == 0))
