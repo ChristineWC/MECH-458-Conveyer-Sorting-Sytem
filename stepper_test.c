@@ -46,6 +46,35 @@ void mTimer(int count){
 	return;
 }
 
+/*
+void StepperGo(){
+	current_step += (dist)/ abs(dist);
+	if(current_step == 4)
+		current_step = 0;
+	if(current_step == -1)
+		current_step = 3;
+	
+	PORTA = spin[current_step];
+	mTimer(step_delay);	
+	
+	current_pos += (dist)/ abs(dist);
+}
+void step_what(){ //sets the distance and speed 
+	dist = (current_pos - to_be_sorted_to);
+	if (dist > 100)
+		dist = 100 - dist; 
+	if (dist < -100)
+		dist = -100 - dist; 
+	
+	//how far to go? set "acc_or_dec" based on current distance and step_delay
+	if (abs(dist) > 20 && (step_delay > 9) && (dist%2 == 0))
+		step_delay--;
+	if (abs(dist) < 16 && (step_delay < 18) && (dist%2 == 0))
+		step_delay++;
+	
+}
+*/
+
 void StepperMotorCW (int steps){
 
 	for(int i = 1; i <= steps; i++){
