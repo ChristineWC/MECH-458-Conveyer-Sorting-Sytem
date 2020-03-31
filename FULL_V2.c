@@ -14,6 +14,9 @@ State current_state;
 volatile int current_step = 4;
 volatile int step_delay = 18; //global variable for i5s speed .
 volatile int current_pos = 0;
+volatile int acc_or_dec = 0; //0 means accelerate, 1 means steady state, 2 means decelerate
+volatile int to_acc = 0; //is it time to accelerate? if == 2, then yes and reset
+volatile int dist = 0; //holds absolute value of # of steps to get where needs to go
 
 int steel_count = 0; 
 int aluminum_count = 0; 
@@ -205,41 +208,34 @@ void StepperMotorCW (int steps){
 	step_delay = 18;
 }
 
-void StepperMotorCCW (int steps){
-	
-	for(int i = 1; i <= steps; i++){
-		if(current_step == 0)
+/*
+void StepperGo(){
+	current_step += (dist)/ abs(dist);
+	if(current_step == 4)
+		current_step = 0;
+	if(current_step == -1)
 		current_step = 3;
-		else
-		current_step--;
-		PORTA = spin[current_step];
-		mTimer(step_delay);
-		
-		if ((i%2 == 0) && (i <= (steps/4)))
+	
+	PORTA = spin[current_step];
+	mTimer(step_delay);	
+	
+	current_pos += (dist)/ abs(dist);
+}
+void step_what(){ //sets the distance and speed 
+	dist = (current_pos - to_be_sorted_to);
+	if (dist >= 100)
+		dist = 100 - dist; 
+	if (dist <= -100)
+		dist = -200 - dist; 
+	
+	//how far to go? set "acc_or_dec" based on current distance and step_delay
+	if (abs(dist) > 20 && (step_delay > 9) && (dist%2 == 0))
 		step_delay--;
-		if ((i%2 == 0) && (i >= (steps*4/5)))
+	if (abs(dist) < 16 && (step_delay < 18) && (dist%2 == 0))
 		step_delay++;
-		if (i%50 == 0)
-		current_pos--;
-
-	}
-	step_delay = 18;
+	
 }
-
-
-void Stepper(int to_be_sorted_to){ // CALL THIS IN MAIN LOOP IN SORTING STATE
-	unsigned int dist = (to_be_sorted_to - current_pos)*50;
-	if (dist == 150)
-	StepperMotorCCW(50);
-	if (dist == -150)
-	StepperMotorCW (50);
-	else if (dist < 0)
-	StepperMotorCCW (-dist);
-	else if (dist > 0)
-	StepperMotorCW (dist);
-}
-
-
+*/
 
 //ISRs
 
@@ -362,8 +358,14 @@ int main(){
 	PORTB = 0b00000010;		// DC motor forward (CCW)    
 	
 	//Here we're gonna do some fucked shit to try to make this thing SMART
-	if(head.next.mat != current_pos){ //is the stepper/bucket ready to recieve the next item?
-		stepper
+	//acc_or_decc is gonna be a variable for if it's accelerating(0), steady(1) or decelerating(2)
+	//to_acc is a variable telling it if it needs to go more or less zoom
+	
+		
+	if(to_be_sorted_to != current_pos){ //is the stepper/bucket ready to recieve the next item?
+		
+	} else { // YES, in position
+		step_delay = 18;	
 	}
 	  switch(State){
 	  	case(0):
