@@ -222,7 +222,7 @@ void StepperGo(){
 	current_pos += (dist)/ abs(dist);
 }
 void step_what(){ //sets the distance and speed 
-	dist = (current_pos - to_be_sorted_to);
+	dist = (current_pos - list->head->material);
 	if (dist >= 100)
 		dist = 100 - dist; 
 	if (dist <= -100)
@@ -362,7 +362,7 @@ int main(){
 	//to_acc is a variable telling it if it needs to go more or less zoom
 	
 		
-	if(to_be_sorted_to != current_pos){ //is the stepper/bucket ready to recieve the next item?
+	if(list->head->material != current_pos){ //is the stepper/bucket ready to recieve the next item?
 		
 	} else { // YES, in position
 		step_delay = 18;	
