@@ -179,7 +179,7 @@ void init_int() //enables all necessary interrupts
     EICRA |= _BV(ISC01);   // Falling Edge on INT0 for hall sensor
     EIMSK |= _BV(INT0);    // Enable INT0 for hall sensor
     EIMSK |= _BV(INT3); //Enable INT3 for EOT sensor	
-    EICRA |= (_BV(ISC31) | _BV(ISC30)); // rising edge interrupt for EOT sensor
+    EICRA |= _BV(ISC31); // falling edge interrupt for EOT sensor
 }
 
 void PWM (){
@@ -305,7 +305,9 @@ ISR(INT3_vect)// EX/EOT sensor, it is hooked up to PORT D3
 	{
 		white_count++; 
 	}
-	//trigger stepper motor state
+	
+	Item* front = list->pop_front(list); // delete that item from the list
+	free(front); 
     /*
     if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor 
     if((PIND &= 0x08) == 0x00)// this means that there is nothing in front of the exit sensor
