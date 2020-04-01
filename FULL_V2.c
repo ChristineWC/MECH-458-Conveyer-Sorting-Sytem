@@ -3,13 +3,12 @@
 #include <stdio.h>
 #include <util/delay_basic.h>
 #include <avr/interrupt.h>
-#include <util/delay.h>
-#include "lcd.h"
-#include <inttypes.h>
+//#include <util/delay.h>
 #include "list.h"
+#include "lcd.h"
 
 //Global variables
-volatile int current_state = 0;//state (running or paused
+volatile int current_state = 0;//state (running or paused)
 volatile int current_step = 0;//for the stepper motor, (0-3)
 volatile int current_pos = 200;//current position of the bucket (0-199)
 volatile int step_delay = 18; //global variable for i5s speed .
@@ -40,6 +39,7 @@ const int Bl_Min = 941;
 const int Wh_Max = 940;
 const int Wh_Min = 700;
 
+List*list; 
 //Linked list functions
 
 List* new_list(){ //this is to initialize the list
@@ -188,26 +188,26 @@ void StepperGo(){
 	if (current_pos < 0)
 		current_pos = 199;
 }
-void step_what(){ //sets the distance and speed 
+
+void step_what(){ //sets the distance and speed
 	dist = (list->head->material - current_pos);
 	if (dist >= 100)
-		dist = dist - 200; 
+	dist = dist - 200;
 	if (dist < -100)
-		dist = dist + 200; 
+	dist = dist + 200;
 	dir = (dist)/ abs(dist);
 
 	//how far to go? set "acc_or_dec" based on current distance and step_delay
 	if (abs(dist) > 20 && (step_delay > 9) && (dist%2 == 0))
-		step_delay--;
+	step_delay--;
 	if (abs(dist) < 16 && (step_delay < 18) && (dist%2 == 0))
-		step_delay++;
+	step_delay++;
 	
 	//does the belt need to slow down?
-	if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor 
-		OCR0A |= 0b01000000; //sets duty cycle to 1/4 to slow down belt and allow bucket to prep 
+	if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor
+	OCR0A |= 0b01000000; //sets duty cycle to 1/4 to slow down belt and allow bucket to prep
 
 }
-
 
 //ISRs
 
@@ -280,10 +280,11 @@ ISR(INT1_vect) { //pause button hooked up to D1
 	mTimer(20);
 	if(current_state == 0){
 		current_state = 1;
-	}else{
+		}else{
 		current_state = 0;
 	}
 }
+
 
 
 int main(){
@@ -295,7 +296,7 @@ int main(){
     DDRF = 0x00; //input for RL sensor @ F1
     List* list = new_list();
     
-    LCDInit(LS_BLINK|LS_ULINE); //initialize LCD subsystem
+    InitLCD(LS_BLINK|LS_ULINE); //initialize LCD subsystem
     TCCR1B |=_BV(CS10); // we need this in main to use the timer
     init_int(); //initializes all interrupts
     PWM(); //Though the duty cycle may need to be changed for the DC motor
@@ -316,7 +317,7 @@ int main(){
 	
 	//Here we're gonna do some fucked shit to try to make this thing SMART
 		
-	if(list->head->material != current_pos){ //is the stepper/bucket ready to recieve the next item?
+	if(list->head->material != current_pos){ //is the stepper/bucket ready to receive the next item?
 		step_what();//sets distance to go, and adjusts the step delay/stepper speed, and slows down belt if necessary
 		StepperGo();
 		
@@ -361,39 +362,40 @@ int main(){
 	    item = item->next; 
 	}
 	
-	
-	
-	
 	//LCD displays number of sorted and pending items
-	LCDWriteStringXY(2, 0, “SYSTEM PAUSE”);
-	for(int i = 0; i < 100; i++){
-		mTimer(15);
-		if(current_state == 0)
+	LCDWriteStringXY(2, 0, "SYSTEM PAUSE");
+		for(int i = 0; i < 100; i++){
+			mTimer(15);
+			if(current_state == 0)
 			goto RUNNING;
-	}
+		}
+		LCDClear();
 
-	LCDWriteStringXY(0, 0, “P = Pending”);
-	LCDWriteStringXY(0, 1, “S = Sorted”);
+	LCDWriteStringXY(0, 0, "P = Pending");
+	LCDWriteStringXY(0, 1, "S = Sorted");
 	for(int i = 0; i < 100; i++){
 		mTimer(10);
 		if(current_state == 0)
-			goto RUNNING;
+		goto RUNNING;
 	}
+	LCDClear(); 	
+
 	//THIS FIRST PART IS SORTED ITEMS FROM WHEREVER WE STORE THEM
-	LCDWriteStringXY(0, 0, “BL: WH: ST: AL: ”);
-	LCDWriteStringXY(0, 1, “S   S   S   S   S   ”);
+	LCDWriteStringXY(0, 0, "BL: WH: ST: AL: ");
+	LCDWriteStringXY(0, 1, "S   S   S   S   S   ");
 	LCDWriteIntXY(1,1,black_count, 2);
 	LCDWriteIntXY(1,5,white_count, 2);
 	LCDWriteIntXY(1,9,steel_count, 2);
 	LCDWriteIntXY(1,13,aluminum_count, 2);
 	for(int i = 0; i < 100; i++){
-		mTimer(30);
-		if(current_state == 0)
+			mTimer(30);
+			if(current_state == 0)
 			goto RUNNING;
 	}
+	
 	//THIS NEXT PART IS PENDING ITEMS FROM LINKED LIST	
-	LCDWriteStringXY(0, 0, “BL: WH: ST: AL: ”);
-	LCDWriteStringXY(0, 1, “P   P   P   P   P   ”);
+	LCDWriteStringXY(0, 0, "BL: WH: ST: AL: ");
+	LCDWriteStringXY(0, 1, "P   P   P   P   P   ");
 	LCDWriteIntXY(1,1,pending_black, 2);
 	LCDWriteIntXY(1,5,pending_white, 2);
 	LCDWriteIntXY(1,9,pending_steel, 2);
@@ -401,15 +403,13 @@ int main(){
 	for(int i = 0; i < 100; i++){
 		mTimer(30);
 		if(current_state == 0)
-			goto RUNNING;
-	}	
+		goto RUNNING;
+	}
 	
-	
-	if (last_state == 1)
+	if (current_state == 1)
 		goto PAUSE;
-	else()
+	else
 		goto RUNNING;
 	
     
-
 }
