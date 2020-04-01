@@ -10,8 +10,8 @@
 
 //Global variables
 volatile int current_state = 0;//state (running or paused
-volatile int current_step = 4;//for the stepper motor, (0-3)
-volatile int current_pos = 0;//current position of the bucket (0-199)
+volatile int current_step = 0;//for the stepper motor, (0-3)
+volatile int current_pos = 200;//current position of the bucket (0-199)
 volatile int step_delay = 18; //global variable for i5s speed .
 volatile int dir = 1; //this should be either +1 or -1, set in step_what() to give direction for bucket
 volatile int dist = 0; //holds absolute value of # of steps to get where needs to go
