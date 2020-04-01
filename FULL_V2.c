@@ -368,12 +368,19 @@ int main(){
 	
 	//LCD displays number of sorted and pending items
 	LCDWriteStringXY(2, 0, “SYSTEM PAUSE”);
-		mTimer(1500);
+	for(int i = 0; i < 100; i++){
+		mTimer(15);
+		if(current_state == 0)
+			goto RUNNING;
+	}
 
 	LCDWriteStringXY(0, 0, “P = Pending”);
 	LCDWriteStringXY(0, 1, “S = Sorted”);
-		mTimer(1000);
-
+	for(int i = 0; i < 100; i++){
+		mTimer(10);
+		if(current_state == 0)
+			goto RUNNING;
+	}
 	//THIS FIRST PART IS SORTED ITEMS FROM WHEREVER WE STORE THEM
 	LCDWriteStringXY(0, 0, “BL: WH: ST: AL: ”);
 	LCDWriteStringXY(0, 1, “S   S   S   S   S   ”);
@@ -381,8 +388,11 @@ int main(){
 	LCDWriteIntXY(1,5,white_count, 2);
 	LCDWriteIntXY(1,9,steel_count, 2);
 	LCDWriteIntXY(1,13,aluminum_count, 2);
-		mTimer(3000);
-
+	for(int i = 0; i < 100; i++){
+		mTimer(30);
+		if(current_state == 0)
+			goto RUNNING;
+	}
 	//THIS NEXT PART IS PENDING ITEMS FROM LINKED LIST	
 	LCDWriteStringXY(0, 0, “BL: WH: ST: AL: ”);
 	LCDWriteStringXY(0, 1, “P   P   P   P   P   ”);
@@ -390,8 +400,11 @@ int main(){
 	LCDWriteIntXY(1,5,pending_white, 2);
 	LCDWriteIntXY(1,9,pending_steel, 2);
 	LCDWriteIntXY(1,13,pending_aluminum, 2);
-		mTimer(3000);
-	
+	for(int i = 0; i < 100; i++){
+		mTimer(30);
+		if(current_state == 0)
+			goto RUNNING;
+	}	
 	
 	
 	if (last_state == 1)
