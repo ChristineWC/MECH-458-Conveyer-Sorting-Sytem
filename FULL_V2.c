@@ -14,8 +14,7 @@ State current_state;
 volatile int current_step = 4;
 volatile int step_delay = 18; //global variable for i5s speed .
 volatile int current_pos = 0;
-volatile int acc_or_dec = 0; //0 means accelerate, 1 means steady state, 2 means decelerate
-volatile int to_acc = 0; //is it time to accelerate? if == 2, then yes and reset
+volatile int dir = 1; //this should be either +1 or -1, set in step_what()
 volatile int dist = 0; //holds absolute value of # of steps to get where needs to go
 
 int steel_count = 0; 
@@ -39,8 +38,8 @@ const int Wh_Min = 700;
 
 //Linked list functions
 
-List* new_list() //this is to initialize the list
-{
+List* new_list(){ //this is to initialize the list
+
 	List* list = (List*)calloc(1, sizeof(List));
 
 	init_list_table(list);
@@ -49,14 +48,13 @@ List* new_list() //this is to initialize the list
 	return list;
 }
 
-void delete_list(List* list) //this function is to make sure that the list pointer is null
-{
+void delete_list(List* list){ //this function is to make sure that the list pointer is null
 	list->destroy(list);
 	free(list);
 }
 
-void init_list_table(List* list)// since this is using function pointers, this lets us use the syntax NameOfList->nameOfFunction(parameters); examples can be seen in main
-{
+void init_list_table(List* list){// since this is using function pointers, this lets us use the syntax NameOfList->nameOfFunction(parameters); examples can be seen in main
+
 	list->create  = create;
 	list->destroy = destroy;
 	list->size    = size;
@@ -66,79 +64,63 @@ void init_list_table(List* list)// since this is using function pointers, this l
 	list->pop_front = pop_front;
 }
 
-void create(List* this) // part of list initialization
-{
+void create(List* this){ // part of list initialization
 	this->head  = NULL;
 	this->tail  = NULL;
 	this->_size = 0;
 }
 
-void destroy(List* this)
-{
-	if (this->empty(this))
-	{
+void destroy(List* this){
+	if (this->empty(this)){
 		return;
 	}
 
 	Item* it;
-	while (this->size(this) != 0)
-	{
+	while (this->size(this) != 0){
 		it = this->pop_front(this);
 		free(it);
 		it = NULL;
 	}
 }
 
-unsigned int size(List* this)
-{
+unsigned int size(List* this){
 	return this->_size;
 }
 
-bool empty(List* this)
-{
+bool empty(List* this){
 	return this->_size == 0;
 }
 
-void push_back(List* this, Material m) // use this function to add stuff to the back of the list
-{
+void push_back(List* this, Material m){ // use this function to add stuff to the back of the list
 	Item* new_item = (Item*)calloc(1, sizeof(Item));
-
 	new_item->material = m;
-
-	if (this->empty(this))
-	{
+	if (this->empty(this)){
 		this->head     = new_item;
 		this->tail     = new_item;
 		new_item->next = NULL;
 		new_item->prev = NULL;
 	}
-	else
-	{
+	else{
 		new_item->prev   = this->tail;
 		new_item->next   = NULL;
 		this->tail->next = new_item;
 		this->tail       = new_item;
 	}
-
 	this->_size++;
 }
 
-Item* pop_front(List* this) // use this function to delete stuff at the front of the list
-{
-	if (this->empty(this))
-	{
+Item* pop_front(List* this){ // use this function to delete stuff at the front of the list
+	if (this->empty(this)){
 		return NULL;
 	}
 
 	Item* front;
-	if (this->_size == 1)
-	{
+	if (this->_size == 1){
 		front      = this->head;
 		this->head = NULL;
 		this->tail = NULL;
 	}
-	else
-	{
+	else{
 		front            = this->head;
 		this->head       = this->head->next;
 		this->head->prev = NULL;
@@ -167,8 +149,7 @@ void mTimer(int count){
     return;
 }
 
-void init_int() //enables all necessary interrupts
-{
+void init_int() {//enables all necessary interrupts
     // config the external interrupt ======================================
     EIMSK |= (_BV(INT2)); // enable INT2 for OR sensor
     EICRA |= (_BV(ISC21) | _BV(ISC20)); // rising edge interrupt for OR sensor
@@ -185,32 +166,12 @@ void init_int() //enables all necessary interrupts
 void PWM (){
     TCCR0A |= 0b10000011; //first bit sets compare match output mode to clear, last two set whole thing to mode 3 (table 13-7)
     TCCR0B |= 0b00000010; //sets clock prescale to 1/8 (Page 114)
-    OCR0A |= 0b01100000; //sets duty cycle to 1/2 
+    OCR0A |= 0b10000000; //sets duty cycle to 1/2 
 }
 
-void StepperMotorCW (int steps){
 
-	for(int i = 1; i <= steps; i++){
-		if(current_step == 3)
-		current_step = 0;
-		else
-		current_step++;
-		PORTA = spin[current_step];
-		mTimer(step_delay);
-
-		if ((i%2 == 0) && (i <= (steps/4)))
-		step_delay--;
-		if ((i%2 == 0) && (i >= (steps*4/5)))
-		step_delay++;
-		if (i%50 == 0)
-		current_pos++;
-	}
-	step_delay = 18;
-}
-
-/*
 void StepperGo(){
-	current_step += (dist)/ abs(dist);
+	current_step += dir;
 	if(current_step == 4)
 		current_step = 0;
 	if(current_step == -1)
@@ -219,10 +180,11 @@ void StepperGo(){
 	PORTA = spin[current_step];
 	mTimer(step_delay);	
 	
-	current_pos += (dist)/ abs(dist);
+	current_pos += dir;
 }
 void step_what(){ //sets the distance and speed 
 	dist = (list->head->material - current_pos);
+	dir = (dist)/ abs(dist);
 	if (dist >= 100)
 		dist = dist - 200; 
 	if (dist <= -100)
@@ -234,75 +196,62 @@ void step_what(){ //sets the distance and speed
 	if (abs(dist) < 16 && (step_delay < 18) && (dist%2 == 0))
 		step_delay++;
 	
+	//does the belt need to slow down?
+	if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor 
+		OCR0A |= 0b01000000; //sets duty cycle to 1/4 to slow down belt and allow bucket to prep 
+
 }
-*/
+
 
 //ISRs
 
-ISR(ADC_vect) //ISR for reflective sensor when ADC conversion complete 
-{
-    current_state = READ_IN_INT;
-	
-    if(ADC < lowest) 
-    {
+ISR(ADC_vect){ //ISR for reflective sensor when ADC conversion complete 
+   // current_state = READ_IN_INT; -do we need this?
+    if(ADC < lowest) {
         lowest = ADC;
     }
 
-    if( (PIND & 0x04 ) == 0x04) // if the item is still in front of the OR sensor 
-    {
+    if( (PIND & 0x04 ) == 0x04){ // if the item is still in front of the OR sensor 
         ADCSRA |= _BV(ADSC); // Starts the conversion
     }
-    else
-    {
-        if(lowest <= Bl_Max && lowest >= Bl_Min)
-        {
+    else{
+        if(lowest <= Bl_Max && lowest >= Bl_Min){
             list->push_back(list, BLACK);
         }
-        else if(lowest <= St_Max && lowest >= St_Min)
-        {
+        else if(lowest <= St_Max && lowest >= St_Min){
             list->push_back(list, STEEL);
         }
-        else if(lowest <= Wh_Max && lowest >= Wh_Min)
-        {
+        else if(lowest <= Wh_Max && lowest >= Wh_Min){
             list->push_back(list, WHITE);
         }
-        else if(lowest <= Al_Max && lowest >= Al_Min)
-        {
+        else if(lowest <= Al_Max && lowest >= Al_Min){
             list->push_back(list, ALUMINUM);
         }
     }
 }
 
-ISR(INT2_vect) // OR sensor
-{
+ISR(INT2_vect){ // OR sensor
     lowest = 0xffff; 
-
     ADCSRA |= _BV(ADSC); // Starts the conversion
-
 }
 
-ISR(INT3_vect)// EX/EOT sensor, it is hooked up to PORT D3
-{
-	State = 1; 
-	
-	PORTB = 0b00000000;    // this is Brake Vcc
+ISR(INT3_vect){// EX/EOT sensor, it is hooked up to PORT D3
+	//current_state = 1; -do we need this?
+	//PORTB = 0b00000000;    // this is Brake Vcc
+
 	Item* it = list->head;
 	Material mat = it->material;
 	
-	if(mat == STEEL)
-	{
+	if(mat == STEEL){
 		steel_count++;
 	}
-	else if(mat == ALUMINUM)
-	{
+	else if(mat == ALUMINUM){
 		aluminum_count++;	
 	}
-	else if(mat == BLACK)
-	{
+	else if(mat == BLACK){
 		black_count++;	
 	}
-	else if(mat == WHITE)
-	{
+	else if(mat == WHITE){
 		white_count++; 
 	}
 	
@@ -322,8 +271,13 @@ ISR(INT0_vect) { // HE sensor is hooked up to PORTD0, will set current position 
 
 ISR(INT1_vect) { //pause button hooked up to D1
 	//put here whatever the pause button ISR code would be
-	last_state = State
-	goto PAUSE;
+	if(current_state == 0){
+		current_state = 1;
+		goto PAUSE;
+	}else{
+		current_state = 0;
+		goto RUNNING;
+	}
 }
 
 
@@ -345,65 +299,46 @@ int main(){
 	
 //initialize the stepper to get it to the starting position
 	while (current_pos != 0){
-		StepperMotorCW(1);
+		StepperGo();
 	}
 	
-	//loop stuff starts
-	
-	//needs global variable "volatile int last_state" set in interrupts
-  
+	//loop stuff starts  
   goto RUNNING;
   
   RUNNING:
 	  //output to lcd that it's running normally
-	  //turn on the dc motor to run belt
-	PORTB = 0b00000010;		// DC motor forward (CCW)    
+	PORTB = 0b00000010;//turns on DC motor forward (CCW)    
 	
 	//Here we're gonna do some fucked shit to try to make this thing SMART
-	//acc_or_decc is gonna be a variable for if it's accelerating(0), steady(1) or decelerating(2)
-	//to_acc is a variable telling it if it needs to go more or less zoom
-	
 		
 	if(list->head->material != current_pos){ //is the stepper/bucket ready to recieve the next item?
+		step_what();//sets distance to go, and adjusts the step delay/stepper speed, and slows down belt if necessary
+		StepperGo();
 		
 	} else { // YES, in position
-		step_delay = 18;	
+		step_delay = 18;
+		OCR0A |= 0b10000000; //sets duty cycle to 1/2 to speed belt back up after bucket aligned
+
 	}
 	  switch(State){
 	  	case(0):
 			goto RUNNING; //basically looping this stuff
 			break;
 		case(1):
-			goto BUCKET; //triggered by EOT interrupt
-			break;
-		case(2):
 			goto PAUSE; //triggered by pause interrupt
 			break;
 
 	  } // Changes states, otherwise keeps running belt
-  
-  BUCKET:
-  	//lcd output that we in the bucket state
-	//add stepper motor code here
-	
-	Stepper(list.color); //This needs to take in the bin number that the object needs to dump into
-  	
-  	State = 0;
-	goto RUNNING;
   	
   PAUSE:
   	//lcd output that we in the pause state
 	//lcd output the right things
 	
 	if (last_state == 1)
-		goto BUCKET;
+		goto PAUSE;
 	else()
 		goto RUNNING;
-    while()
-    {
-	PORTB = 0b00000010;		// DC motor forward (CCW)      
-    }
-	
+
 	
 	    
 	    
