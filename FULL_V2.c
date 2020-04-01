@@ -280,10 +280,8 @@ ISR(INT1_vect) { //pause button hooked up to D1
 	mTimer(20);
 	if(current_state == 0){
 		current_state = 1;
-		goto PAUSE;
 	}else{
 		current_state = 0;
-		goto RUNNING;
 	}
 }
 
