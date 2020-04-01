@@ -180,6 +180,8 @@ void StepperGo(){
 	mTimer(step_delay);	
 	
 	current_pos += dir;
+	if (current_pos < 0)
+		current_pos = 199;
 }
 void step_what(){ //sets the distance and speed 
 	dist = (list->head->material - current_pos);
