@@ -348,10 +348,10 @@ int main(){
 	//THIS FIRST PART IS SORTED ITEMS FROM WHEREVER WE STORE THEM
 	LCDWriteStringXY(0, 0, “BL: WH: ST: AL: ”);
 	LCDWriteStringXY(0, 1, “S   S   S   S   S   ”);
-	LCDWriteIntXY(1,1,*NUM_BL*, 2);
-	LCDWriteIntXY(1,5,*NUM_WH*, 2);
-	LCDWriteIntXY(1,9,*NUM_ST*, 2);
-	LCDWriteIntXY(1,13,*NUM_AL*, 2);
+	LCDWriteIntXY(1,1,black_count, 2);
+	LCDWriteIntXY(1,5,white_count, 2);
+	LCDWriteIntXY(1,9,steel_count, 2);
+	LCDWriteIntXY(1,13,aluminu_count, 2);
 		mTimer(3000);
 
 	//THIS NEXT PART IS PENDING ITEMS FROM LINKED LIST	
