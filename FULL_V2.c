@@ -21,6 +21,11 @@ int aluminum_count = 0;
 int black_count = 0; 
 int white_count = 0; 
 
+int pending_steel = 0;
+int pending_aluminum = 0;
+int pending_black = 0;
+int pending_white = 0;
+
 int spin[4] = {0b00110000, 0b00000110, 0b00101000, 0b00000101};
 
 unsigned int lowest;
@@ -339,6 +344,28 @@ int main(){
 	step_delay = 17; //returns the step delay to a reasonable speed, in case it was paused in the bucket stage
 	//might need a small loop here that ramps down the bucket in case it's going full tilt
 	
+	//To count up the number and the types of things pending
+	Item* item = list-> head;
+	
+	while(item != NULL){ 
+	    if(item-> material == STEEL){
+		pending_steel++; 
+	    }
+	    else if(item->material == ALUMINUM){
+		pending_aluminum++;
+	    }
+	    else if(item->material == BLACK){
+		pending_black++;
+	    }
+	    else if(item->material == WHITE){
+		pending_white++;
+	    }
+	    item = item->next; 
+	}
+	
+	
+	
+	
 	//LCD displays number of sorted and pending items
 	LCDWriteStringXY(2, 0, “SYSTEM PAUSE”);
 		mTimer(1500);
@@ -353,16 +380,16 @@ int main(){
 	LCDWriteIntXY(1,1,black_count, 2);
 	LCDWriteIntXY(1,5,white_count, 2);
 	LCDWriteIntXY(1,9,steel_count, 2);
-	LCDWriteIntXY(1,13,aluminu_count, 2);
+	LCDWriteIntXY(1,13,aluminum_count, 2);
 		mTimer(3000);
 
 	//THIS NEXT PART IS PENDING ITEMS FROM LINKED LIST	
 	LCDWriteStringXY(0, 0, “BL: WH: ST: AL: ”);
 	LCDWriteStringXY(0, 1, “P   P   P   P   P   ”);
-	LCDWriteIntXY(1,1,*NUM_BLP*, 2);
-	LCDWriteIntXY(1,5,*NUM_WHP*, 2);
-	LCDWriteIntXY(1,9,*NUM_STP*, 2);
-	LCDWriteIntXY(1,13,*NUM_ALP*, 2);
+	LCDWriteIntXY(1,1,pending_black, 2);
+	LCDWriteIntXY(1,5,pending_white, 2);
+	LCDWriteIntXY(1,9,pending_steel, 2);
+	LCDWriteIntXY(1,13,pending_aluminum, 2);
 		mTimer(3000);
 	
 	
@@ -371,10 +398,6 @@ int main(){
 		goto PAUSE;
 	else()
 		goto RUNNING;
-
-	
-	    
-	    
 	
     
 
