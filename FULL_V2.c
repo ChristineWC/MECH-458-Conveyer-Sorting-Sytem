@@ -9,12 +9,11 @@
 #include "list.h"
 
 //Global variables
-State current_state;
-
-volatile int current_step = 4;
+volatile int current_state = 0;//state (running or paused
+volatile int current_step = 4;//for the stepper motor, (0-3)
+volatile int current_pos = 0;//current position of the bucket (0-199)
 volatile int step_delay = 18; //global variable for i5s speed .
-volatile int current_pos = 0;
-volatile int dir = 1; //this should be either +1 or -1, set in step_what()
+volatile int dir = 1; //this should be either +1 or -1, set in step_what() to give direction for bucket
 volatile int dist = 0; //holds absolute value of # of steps to get where needs to go
 
 int steel_count = 0; 
@@ -271,6 +270,7 @@ ISR(INT0_vect) { // HE sensor is hooked up to PORTD0, will set current position 
 
 ISR(INT1_vect) { //pause button hooked up to D1
 	//put here whatever the pause button ISR code would be
+	mTimer(20);
 	if(current_state == 0){
 		current_state = 1;
 		goto PAUSE;
@@ -320,7 +320,7 @@ int main(){
 		OCR0A |= 0b10000000; //sets duty cycle to 1/2 to speed belt back up after bucket aligned
 
 	}
-	  switch(State){
+	  switch(current_state){
 	  	case(0):
 			goto RUNNING; //basically looping this stuff
 			break;
@@ -332,7 +332,38 @@ int main(){
   	
   PAUSE:
   	//lcd output that we in the pause state
-	//lcd output the right things
+	PORTB = 0b00000000;	//DC motor STOP
+	PORTB = 0b00001100; 	//DC motor OFF
+	step_delay = 17; //returns the step delay to a reasonable speed, in case it was paused in the bucket stage
+	//might need a small loop here that ramps down the bucket in case it's going full tilt
+	
+	//LCD displays number of sorted and pending items
+	LCDWriteStringXY(2, 0, “SYSTEM PAUSE”);
+		mTimer(1500);
+
+	LCDWriteStringXY(0, 0, “P = Pending”);
+	LCDWriteStringXY(0, 1, “S = Sorted”);
+		mTimer(1000);
+
+	//THIS FIRST PART IS SORTED ITEMS FROM WHEREVER WE STORE THEM
+	LCDWriteStringXY(0, 0, “BL: WH: ST: AL: ”);
+	LCDWriteStringXY(0, 1, “S   S   S   S   S   ”);
+	LCDWriteIntXY(1,1,*NUM_BL*, 2);
+	LCDWriteIntXY(1,5,*NUM_WH*, 2);
+	LCDWriteIntXY(1,9,*NUM_ST*, 2);
+	LCDWriteIntXY(1,13,*NUM_AL*, 2);
+		mTimer(3000);
+
+	//THIS NEXT PART IS PENDING ITEMS FROM LINKED LIST	
+	LCDWriteStringXY(0, 0, “BL: WH: ST: AL: ”);
+	LCDWriteStringXY(0, 1, “P   P   P   P   P   ”);
+	LCDWriteIntXY(1,1,*NUM_BLP*, 2);
+	LCDWriteIntXY(1,5,*NUM_WHP*, 2);
+	LCDWriteIntXY(1,9,*NUM_STP*, 2);
+	LCDWriteIntXY(1,13,*NUM_ALP*, 2);
+		mTimer(3000);
+	
+	
 	
 	if (last_state == 1)
 		goto PAUSE;
