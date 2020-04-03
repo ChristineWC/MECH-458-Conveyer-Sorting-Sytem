@@ -165,6 +165,8 @@ void init_int() {//enables all necessary interrupts
     EIMSK |= _BV(INT0);    // Enable INT0 for hall sensor
     EIMSK |= _BV(INT3); //Enable INT3 for EOT sensor	
     EICRA |= _BV(ISC31); // falling edge interrupt for EOT sensor
+    EIMSK |= _BV(INT1); // Enable INT1 for the pause button
+    EICRA |= (_BV(ISC11) | _BV(ISC10)); // rising edge interrupt for pause button
 }
 
 void PWM (){
