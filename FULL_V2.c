@@ -178,6 +178,11 @@ void PWM (){
 
 void StepperGo(){
 	current_step += dir;
+	current_pos += dir;
+	
+	if (current_pos < 0)
+		current_pos = 199;
+	
 	if(current_step == 4)
 		current_step = 0;
 	if(current_step == -1)
@@ -185,10 +190,6 @@ void StepperGo(){
 	
 	PORTA = spin[current_step];
 	mTimer(step_delay);	
-	
-	current_pos += dir;
-	if (current_pos < 0)
-		current_pos = 199;
 }
 
 void step_what(){ //sets the distance and speed
@@ -306,9 +307,14 @@ int main(){
 
 	
 //initialize the stepper to get it to the starting position
+	LCDWriteStringXY(0, 0, "Homing Start");
 	while (current_pos != 0){
 		StepperGo();
 	}
+	LCDWriteStringXY(0, 0, "Homing Complete");
+	LCDWriteStringXY(0, 1, "Starting Sort");
+	mTimer(1500); //notifies that initialization is complete and ready to begin
+	
 	
 	//loop stuff starts  
   goto RUNNING;
@@ -319,7 +325,7 @@ int main(){
 	
 	//Here we're gonna do some fucked shit to try to make this thing SMART
 		
-	if(list->head->material != current_pos){ //is the stepper/bucket ready to receive the next item?
+	if((list->head->material != current_pos) && (list.size() != 0)){ //is the stepper/bucket ready to receive the next item?
 		step_what();//sets distance to go, and adjusts the step delay/stepper speed, and slows down belt if necessary
 		StepperGo();
 		
