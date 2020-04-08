@@ -281,5 +281,5 @@ int main(){
 			break;
 
 	  } // Changes states, otherwise keeps running belt
-  	
+			 }
 
