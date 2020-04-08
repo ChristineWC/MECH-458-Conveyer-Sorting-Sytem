@@ -8,6 +8,8 @@
  "PART PENDING" and "PART SORTED". 
  At the end, the LCD should display the size of the list which should be 0 at that point
  and will display the number of each piece that has gone past the EX sensor. 
+ If incorrect list size and count for each piece is wrong, run new test by uncommenting comments in Pause button ISR
+ Press reset, test one or two pieces, after they have left OR sensor press pause
  */ 
 
 #include <avr/io.h>
@@ -22,6 +24,11 @@ int steel_count = 0;
 int aluminum_count = 0;
 int black_count = 0;
 int white_count = 0;
+
+int pending_steel = 0;
+int pending_aluminum = 0;
+int pending_black = 0;
+int pending_white = 0;
 
 unsigned int lowest;
 int ADC_resultflag = 0;
@@ -183,16 +190,19 @@ ISR(ADC_vect){ //ISR for reflective sensor when ADC conversion complete
 		
 		if(lowest <= Bl_Max && lowest >= Bl_Min){
 			list->push_back(list, BLACK);
+			pending_black++;
 		}
 		else if(lowest <= St_Max && lowest >= St_Min){
 			list->push_back(list, STEEL);
+			pending_steel++;
 		}
 		else if(lowest <= Wh_Max && lowest >= Wh_Min){
 			list->push_back(list, WHITE);
+			pending_white++;			
 		}
 		else if(lowest <= Al_Max && lowest >= Al_Min){
 			list->push_back(list, ALUMINUM);
-			
+			pending_aluminum++;
 		}
 	}
 	LCDClear();
@@ -205,8 +215,6 @@ ISR(INT2_vect){ // OR sensor
 }
 
 ISR(INT3_vect){// EX/EOT sensor, it is hooked up to PORT D3
-	//current_state = 1; -do we need this?
-	//PORTB = 0b00000000;    // this is Brake Vcc
 
 	Item* it = list->head;
 	Material mat = it->material;
@@ -243,12 +251,24 @@ ISR(INT1_vect) { //pause button hooked up to D1
 	LCDWriteIntXY(14,0,list->size(list), 2);
 	mTimer(3000); 
 	
+	//comment this section out if performing second test
+	LCDClear();
 	LCDWriteStringXY(0, 0, "BL: WH: ST: AL: ");
 	LCDWriteStringXY(0, 1, "S   S   S   S   S   ");
 	LCDWriteIntXY(1,1,black_count, 2);
 	LCDWriteIntXY(1,5,white_count, 2);
 	LCDWriteIntXY(1,9,steel_count, 2);
 	LCDWriteIntXY(1,13,aluminum_count, 2);
+	
+	/*
+	LCDClear(); 
+	LCDWriteStringXY(0, 0, "BL: WH: ST: AL: ");
+	LCDWriteStringXY(0, 1, "P   P   P   P   P   ");
+	LCDWriteIntXY(1,1,pending_black, 2);
+	LCDWriteIntXY(1,5,pending_white, 2);
+	LCDWriteIntXY(1,9,pending_steel, 2);
+	LCDWriteIntXY(1,13,pending_aluminum, 2);
+	*/
 	
 }
 
