@@ -224,19 +224,25 @@ ISR(ADC_vect){ //ISR for reflective sensor when ADC conversion complete
         ADCSRA |= _BV(ADSC); // Starts the conversion
     }
     else{
+		LCDClear(); 
         if(lowest <= Bl_Max && lowest >= Bl_Min){
             list->push_back(list, BLACK);
+			LCDWriteStringXY(0, 0, "PART: BLACK");
         }
         else if(lowest <= St_Max && lowest >= St_Min){
             list->push_back(list, STEEL);
+			LCDWriteStringXY(0, 0, "PART: STEEL");
         }
         else if(lowest <= Wh_Max && lowest >= Wh_Min){
             list->push_back(list, WHITE);
+			LCDWriteStringXY(0, 0, "PART: WHITE");
         }
         else if(lowest <= Al_Max && lowest >= Al_Min){
             list->push_back(list, ALUMINUM);
+			LCDWriteStringXY(0, 0, "PART: ALUMINUM");
         }
     }
+	LCDWriteStringXY(0, 1, "PART PENDING");
 }
 
 ISR(INT2_vect){ // OR sensor
@@ -266,6 +272,8 @@ ISR(INT3_vect){// EX/EOT sensor, it is hooked up to PORT D3
 	
 	Item* front = list->pop_front(list); // delete that item from the list
 	free(front); 
+	LCDClear();
+	LCDWriteStringXY(0, 0, "PART SORTED");
     /*
     if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor 
     if((PIND &= 0x08) == 0x00)// this means that there is nothing in front of the exit sensor
@@ -421,3 +429,4 @@ int main(){
 	
     
 }
+
