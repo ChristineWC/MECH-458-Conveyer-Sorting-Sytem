@@ -30,110 +30,7 @@ int spin[4] = {0b00110000, 0b00000110, 0b00101000, 0b00000101};
 unsigned int lowest;
 int ADC_resultflag = 0;
 
-const int Al_Max = 350;
-const int Al_Min = 0;
-const int St_Max = 699;
-const int St_Min = 351;
-const int Bl_Max = 1023;
-const int Bl_Min = 941;
-const int Wh_Max = 940;
-const int Wh_Min = 700;
 
-List*list;
-//Linked list functions
-
-List* new_list(){ //this is to initialize the list
-
-	List* list = (List*)calloc(1, sizeof(List));
-
-	init_list_table(list);
-	list->create(list);
-
-	return list;
-}
-
-void delete_list(List* list){ //this function is to make sure that the list pointer is null
-	list->destroy(list);
-	free(list);
-}
-
-void init_list_table(List* list){// since this is using function pointers, this lets us use the syntax NameOfList->nameOfFunction(parameters); examples can be seen in main
-
-	list->create  = create;
-	list->destroy = destroy;
-	list->size    = size;
-	list->empty   = empty;
-
-	list->push_back = push_back;
-	list->pop_front = pop_front;
-}
-
-void create(List* this){ // part of list initialization
-	this->head  = NULL;
-	this->tail  = NULL;
-	this->_size = 0;
-}
-
-void destroy(List* this){
-	if (this->empty(this)){
-		return;
-	}
-
-	Item* it;
-	while (this->size(this) != 0){
-		it = this->pop_front(this);
-		free(it);
-		it = NULL;
-	}
-}
-
-unsigned int size(List* this){
-	return this->_size;
-}
-
-bool empty(List* this){
-	return this->_size == 0;
-}
-
-void push_back(List* this, Material m){ // use this function to add stuff to the back of the list
-	Item* new_item = (Item*)calloc(1, sizeof(Item));
-	new_item->material = m;
-	if (this->empty(this)){
-		this->head     = new_item;
-		this->tail     = new_item;
-		new_item->next = NULL;
-		new_item->prev = NULL;
-	}
-	else{
-		new_item->prev   = this->tail;
-		new_item->next   = NULL;
-		this->tail->next = new_item;
-		this->tail       = new_item;
-	}
-	this->_size++;
-}
-
-Item* pop_front(List* this){ // use this function to delete stuff at the front of the list
-	if (this->empty(this)){
-		return NULL;
-	}
-
-	Item* front;
-	if (this->_size == 1){
-		front      = this->head;
-		this->head = NULL;
-		this->tail = NULL;
-	}
-	else{
-		front            = this->head;
-		this->head       = this->head->next;
-		this->head->prev = NULL;
-		front->next      = NULL;
-	}
-
-	this->_size--;
-	return front;
-}
 
 
 //Functions
@@ -179,9 +76,9 @@ void step_what(){ //sets the distance and speed
 	dir = (dist)/ abs(dist);
 
 	//how far to go? set "acc_or_dec" based on current distance and step_delay
-	if (abs(dist) > 20 && (step_delay > 9) && (dist%2 == 0))
+	if (abs(dist) > 20 && (step_delay > 9) && (dist%3 == 0))
 	step_delay--;
-	if (abs(dist) < 16 && (step_delay < 18) && (dist%2 == 0))
+	if (abs(dist) < 16 && (step_delay < 18) && (dist%3 == 0))
 	step_delay++;
 	
 }
@@ -231,44 +128,66 @@ int main(){
 		StepperGo();
 	}
 	LCDWriteStringXY(0, 0, "Homing Complete");
-	LCDWriteStringXY(0, 1, "Starting Sort");
+	LCDWriteStringXY(0, 1, "Start Steptest");
 	mTimer(1500); //notifies that initialization is complete and ready to begin
 	
-	//run a test, adding items to the linked list
+	//run a test, having stepper motor just go to a couple different locations
 	
-	list->push_back(list, STEEL);
-	list->push_back(list, ALUMINUM);
-	list->push_back(list, WHITE);
-	list->push_back(list, BLACK);
-
-	LCDClear();
-	LCDWriteStringXY(0, 0, "list size is:" );
-	LCDWriteIntXY(14,0,list->size(list), 2);
+	int togoto = 50;
 	
-	//loop stuff starts
-	goto RUNNING;
-	
-	RUNNING:
-	//output to lcd that it's running normally
-	
-	//Here we're gonna do some fucked shit to try to make this thing SMART
-	
-	if((list->head->material != current_pos) && (list->head != NULL)){ //is the stepper/bucket ready to receive the next item?
-		step_what();//sets distance to go, and adjusts the step delay/stepper speed, and slows down belt if necessary
+	while (togoto != current_pos){
+		step_what();
 		StepperGo();
-		
-		} else if(list->head != NULL){ // YES, in position
-		
-		Item* front = list->pop_front(list); // delete that item from the list
-		free(front);
-		LCDWriteIntXY(14,0,list->size(list), 2);
-		
-		step_delay = 18;
-		}
-		
-	switch(current_state){
-		case(0):
-		goto RUNNING; //basically looping this stuff
-		break;
-	} // Changes states, otherwise keeps running belt
+	}
+	step_delay = 18;
+	LCDWriteStringXY(0, 0, "Items sorted: 1" );
+	LCDWriteStringXY(0, 1, "Moving on" );
+	mTimer(500);
+	
+	togoto = 150;
+	
+	while (togoto != current_pos){
+		step_what();
+		StepperGo();
+	}
+	step_delay = 18;
+	LCDWriteStringXY(0, 0, "Items sorted: 2" );
+	LCDWriteStringXY(0, 1, "Moving on" );
+	mTimer(500);
+	
+	togoto = 100;
+	
+	while (togoto != current_pos){
+		step_what();
+		StepperGo();
+	}
+	step_delay = 18;
+	LCDWriteStringXY(0, 0, "Items sorted: 3" );
+	LCDWriteStringXY(0, 1, "Moving on" );
+	mTimer(500);
+	
+	togoto = 0;
+	
+	while (togoto != current_pos){
+		step_what();
+		StepperGo();
+	}
+	step_delay = 18;
+	LCDWriteStringXY(0, 0, "Items sorted: 4" );
+	LCDWriteStringXY(0, 1, "Moving on" );
+	mTimer(500);
+	
+	togoto = 150;
+	
+	while (togoto != current_pos){
+		step_what();
+		StepperGo();
+	}
+	step_delay = 18;
+	LCDWriteStringXY(0, 0, "Items sorted: 5" );
+	LCDWriteStringXY(0, 1, "Done" );
+	mTimer(1500);
+	
+	
+	
 }
