@@ -3,7 +3,7 @@
  
  Test: (If helpful, the speed of the DC motor can be slowed down in the PWM() function)
  Press reset, put parts on the conveyor belt, parts should run through system and not be sorted. 
- After 4 pieces have gone past the EX sensor, press pause and the conveyor belt should stop.
+ After pieces have gone past the EX sensor, press pause and the conveyor belt should stop.
  If everything has been done correctly, during the test the LCD screen would alternate between 
  "PART PENDING" and "PART SORTED". 
  At the end, the LCD should display the size of the list which should be 0 at that point
