@@ -248,7 +248,7 @@ int main(){
 
 	LCDClear();
 	LCDWriteStringXY(0, 0, "list size is: );
-	LCDWriteIntXY(0,14,list->size(), 2);
+	LCDWriteIntXY(14,0,list->size(), 2);
 
 
 	
@@ -269,7 +269,7 @@ int main(){
 		Item* it = list->head;
 		Item* front = list->pop_front(list); // delete that item from the list
 		free(front); 
-		LCDWriteIntXY(0,14,list->size(), 2);
+		LCDWriteIntXY(14,0,list->size(list), 2);
 		
 		step_delay = 18;
 		OCR0A |= 0b10000000; //sets duty cycle to 1/2 to speed belt back up after bucket aligned
