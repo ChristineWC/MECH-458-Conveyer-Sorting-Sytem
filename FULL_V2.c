@@ -325,7 +325,7 @@ int main(){
 	
 	//Here we're gonna do some fucked shit to try to make this thing SMART
 		
-	if((list->head->material != current_pos) && (list.size() != 0)){ //is the stepper/bucket ready to receive the next item?
+	if((list->head->material != current_pos) && (list->head != NULL)){ //is the stepper/bucket ready to receive the next item?
 		step_what();//sets distance to go, and adjusts the step delay/stepper speed, and slows down belt if necessary
 		StepperGo();
 		
