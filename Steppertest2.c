@@ -239,6 +239,18 @@ int main(){
 	LCDWriteStringXY(0, 1, "Starting Sort");
 	mTimer(1500); //notifies that initialization is complete and ready to begin
 	
+//run a test, adding items to the linked list
+	
+	list->push_back(list, STEEL);
+	list->push_back(list, ALUMINUM);
+	list->push_back(list, WHITE);
+	list->push_back(list, BLACK);
+
+	LCDClear();
+	LCDWriteStringXY(0, 0, "list size is: );
+	LCDWriteIntXY(0,14,list->size(), 2);
+
+
 	
 	//loop stuff starts  
   goto RUNNING;
@@ -254,6 +266,11 @@ int main(){
 		StepperGo();
 		
 	} else { // YES, in position
+		Item* it = list->head;
+		Item* front = list->pop_front(list); // delete that item from the list
+		free(front); 
+		LCDWriteIntXY(0,14,list->size(), 2);
+		
 		step_delay = 18;
 		OCR0A |= 0b10000000; //sets duty cycle to 1/2 to speed belt back up after bucket aligned
 
