@@ -152,3 +152,117 @@ void mTimer(int count){
     }
     return;
 }
+
+
+void StepperGo(){
+	current_step += dir;
+	current_pos += dir;
+	
+	if (current_pos < 0)
+		current_pos = 199;
+	
+	if(current_step == 4)
+		current_step = 0;
+	if(current_step == -1)
+		current_step = 3;
+	
+	PORTA = spin[current_step];
+	mTimer(step_delay);	
+}
+
+void step_what(){ //sets the distance and speed
+	dist = (list->head->material - current_pos);
+	if (dist >= 100)
+	dist = dist - 200;
+	if (dist < -100)
+	dist = dist + 200;
+	dir = (dist)/ abs(dist);
+
+	//how far to go? set "acc_or_dec" based on current distance and step_delay
+	if (abs(dist) > 20 && (step_delay > 9) && (dist%2 == 0))
+	step_delay--;
+	if (abs(dist) < 16 && (step_delay < 18) && (dist%2 == 0))
+	step_delay++;
+	
+	//does the belt need to slow down?
+	if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor
+	OCR0A |= 0b01000000; //sets duty cycle to 1/4 to slow down belt and allow bucket to prep
+
+}
+
+void init_int() {//enables all necessary interrupts
+    // config the external interrupt ======================================
+    EIMSK |= (_BV(INT2)); // enable INT2 for OR sensor
+    EICRA |= (_BV(ISC21) | _BV(ISC20)); // rising edge interrupt for OR sensor
+    ADCSRA |= _BV(ADEN); // enable ADC
+    ADCSRA |= _BV(ADIE); // enable interrupt of ADC
+    ADMUX |= _BV(MUX0) | _BV(REFS0); //ADC Multiplexer selection register bits 5 and 6 set to 1, ADLAR = ADC left adjust result; 
+    //REFS0 set to 1 which selects voltage reference selection to core voltage (3.3v) 
+    EICRA |= _BV(ISC01);   // Falling Edge on INT0 for hall sensor
+    EIMSK |= _BV(INT0);    // Enable INT0 for hall sensor
+    EIMSK |= _BV(INT3); //Enable INT3 for EOT sensor	
+    EICRA |= _BV(ISC31); // falling edge interrupt for EOT sensor
+    EIMSK |= _BV(INT1); // Enable INT1 for the pause button
+    EICRA |= (_BV(ISC11) | _BV(ISC10)); // rising edge interrupt for pause button
+}
+
+
+
+ISR(INT0_vect) { // HE sensor is hooked up to PORTD0, will set current position to 0 every time HE sensor is triggered
+	current_pos = 0;
+}
+
+
+
+int main(){
+//initialization
+    DDRD = 0x00; // for the interrupts for the sensors
+    DDRB = 0xff; // for the dc motor
+    DDRC = 0xff; // output for the LCD
+    DDRA = 0xff; //output for stepper
+    DDRF = 0x00; //input for RL sensor @ F1
+    List* list = new_list();
+    
+    InitLCD(LS_BLINK|LS_ULINE); //initialize LCD subsystem
+    TCCR1B |=_BV(CS10); // we need this in main to use the timer
+    init_int(); //initializes all interrupts
+    PWM(); //Though the duty cycle may need to be changed for the DC motor
+    sei(); // sets the Global Enable for all interrupts
+
+	
+//initialize the stepper to get it to the starting position
+	LCDWriteStringXY(0, 0, "Homing Start");
+	while (current_pos != 0){
+		StepperGo();
+	}
+	LCDWriteStringXY(0, 0, "Homing Complete");
+	LCDWriteStringXY(0, 1, "Starting Sort");
+	mTimer(1500); //notifies that initialization is complete and ready to begin
+	
+	
+	//loop stuff starts  
+  goto RUNNING;
+  
+  RUNNING:
+	  //output to lcd that it's running normally
+	PORTB = 0b00000010;//turns on DC motor forward (CCW)    
+	
+	//Here we're gonna do some fucked shit to try to make this thing SMART
+		
+	if((list->head->material != current_pos) && (list->head != NULL)){ //is the stepper/bucket ready to receive the next item?
+		step_what();//sets distance to go, and adjusts the step delay/stepper speed, and slows down belt if necessary
+		StepperGo();
+		
+	} else { // YES, in position
+		step_delay = 18;
+		OCR0A |= 0b10000000; //sets duty cycle to 1/2 to speed belt back up after bucket aligned
+
+	}
+	  switch(current_state){
+	  	case(0):
+			goto RUNNING; //basically looping this stuff
+			break;
+
+	  } // Changes states, otherwise keeps running belt
+  	
+
