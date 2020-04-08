@@ -184,10 +184,6 @@ void step_what(){ //sets the distance and speed
 	if (abs(dist) < 16 && (step_delay < 18) && (dist%2 == 0))
 	step_delay++;
 	
-	//does the belt need to slow down?
-	if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor
-	OCR0A |= 0b01000000; //sets duty cycle to 1/4 to slow down belt and allow bucket to prep
-
 }
 
 void init_int() {//enables all necessary interrupts
@@ -254,7 +250,6 @@ int main(){
 	
 	RUNNING:
 	//output to lcd that it's running normally
-	PORTB = 0b00000010;//turns on DC motor forward (CCW)
 	
 	//Here we're gonna do some fucked shit to try to make this thing SMART
 	
@@ -262,15 +257,15 @@ int main(){
 		step_what();//sets distance to go, and adjusts the step delay/stepper speed, and slows down belt if necessary
 		StepperGo();
 		
-		} else { // YES, in position
-	
+		} else if(list->head != NULL){ // YES, in position
+		
 		Item* front = list->pop_front(list); // delete that item from the list
 		free(front);
 		LCDWriteIntXY(14,0,list->size(list), 2);
 		
 		step_delay = 18;
-		OCR0A |= 0b10000000; //sets duty cycle to 1/2 to speed belt back up after bucket aligned
-	}
+		}
+		
 	switch(current_state){
 		case(0):
 		goto RUNNING; //basically looping this stuff
