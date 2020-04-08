@@ -20,6 +20,8 @@
 #include "list.h"
 #include "lcd.h"
 
+int state = 0;
+
 int steel_count = 0;
 int aluminum_count = 0;
 int black_count = 0;
@@ -259,6 +261,8 @@ ISR(INT1_vect) { //pause button hooked up to D1
 	LCDWriteIntXY(1,5,white_count, 2);
 	LCDWriteIntXY(1,9,steel_count, 2);
 	LCDWriteIntXY(1,13,aluminum_count, 2);
+	mTimer(5000); 
+	state = 1; 
 	
 	/*
 	LCDClear(); 
@@ -268,6 +272,8 @@ ISR(INT1_vect) { //pause button hooked up to D1
 	LCDWriteIntXY(1,5,pending_white, 2);
 	LCDWriteIntXY(1,9,pending_steel, 2);
 	LCDWriteIntXY(1,13,pending_aluminum, 2);
+	
+	state = 1; 
 	*/
 	
 }
@@ -289,7 +295,8 @@ int main(void)
     PWM(); //Though the duty cycle may need to be changed for the DC motor
     sei(); // sets the Global Enable for all interrupts
 	
+    while(state != 1){ // state changes to one after the button is pressed and all the stuff in the pause button ISR does its stuff
 	PORTB = 0b00000010;//turns on DC motor forward (CCW)    
-		
+    }
 }
 
