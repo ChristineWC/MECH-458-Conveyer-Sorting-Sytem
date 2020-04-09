@@ -302,6 +302,7 @@ int main(){
     init_int(); //initializes all interrupts
     PWM(); //Though the duty cycle may need to be changed for the DC motor
     sei(); // sets the Global Enable for all interrupts
+    setup(&head, &tail); 
 
 	
 //initialize the stepper to get it to the starting position
