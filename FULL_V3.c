@@ -271,16 +271,16 @@ ISR(INT2_vect){ // OR sensor
 
 ISR(INT3_vect){// EX/EOT sensor, it is hooked up to PORT D3
 	
-	if(mat == STEEL){
+	if(head->mat == STEEL){
 		steel_count++;
 	}
-	else if(mat == ALUMINUM){
+	else if(head->mat == ALUMINUM){
 		aluminum_count++;	
 	}
-	else if(mat == BLACK){
+	else if(head->mat == BLACK){
 		black_count++;	
 	}
-	else if(mat == WHITE){
+	else if(head->mat == WHITE){
 		white_count++; 
 	}
 	
@@ -302,7 +302,6 @@ ISR(INT0_vect) { // HE sensor is hooked up to PORTD0, will set current position 
 }
 
 ISR(INT1_vect) { //pause button hooked up to D1
-	//put here whatever the pause button ISR code would be
 	mTimer(20);
 	if(current_state == 0){
 		current_state = 1;
@@ -373,7 +372,7 @@ int main(){
 	//might need a small loop here that ramps down the bucket in case it's going full tilt
 	
 	//To count up the number and the types of things pending
-	Item* item = list-> head;
+	/*Item* item = list-> head;
 	
 	while(item != NULL){ 
 	    if(item-> material == STEEL){
@@ -390,8 +389,8 @@ int main(){
 	    }
 	    item = item->next; 
 	}
+	*/
 	
-	/*
 	Item 	*temp;			
 	temp = *h;			
 	while(temp != NULL){
@@ -409,9 +408,6 @@ int main(){
 	     }
 		temp = temp->next;
 	}
-	*/
-	
-	
 	
 	//LCD displays number of sorted and pending items
 	LCDWriteStringXY(2, 0, "SYSTEM PAUSE");
