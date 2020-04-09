@@ -338,29 +338,8 @@ int main(){
   PAUSE:
   	//lcd output that we in the pause state
 	PORTB = 0b00000000;	//DC motor STOP
-	PORTB = 0b00001100; 	//DC motor OFF
 	step_delay = 17; //returns the step delay to a reasonable speed, in case it was paused in the bucket stage
 	//might need a small loop here that ramps down the bucket in case it's going full tilt
-	
-	//To count up the number and the types of things pending
-	/*Item* item = list-> head;
-	
-	while(item != NULL){ 
-	    if(item-> material == STEEL){
-		pending_steel++; 
-	    }
-	    else if(item->material == ALUMINUM){
-		pending_aluminum++;
-	    }
-	    else if(item->material == BLACK){
-		pending_black++;
-	    }
-	    else if(item->material == WHITE){
-		pending_white++;
-	    }
-	    item = item->next; 
-	}
-	*/
 	
 	Item* temp;			
 	temp = head;			
@@ -431,4 +410,3 @@ int main(){
 	
     
 }
-
