@@ -189,9 +189,9 @@ void step_what(){ //sets the distance and speed
 	dir = (dist)/ abs(dist);
 
 	//how far to go? set "acc_or_dec" based on current distance and step_delay
-	if (abs(dist) > 20 && (step_delay > 9) && (dist%2 == 0))
+	if (abs(dist) > 20 && (step_delay > 9) && (dist%3 == 0))
 	step_delay--;
-	if (abs(dist) < 16 && (step_delay < 18) && (dist%2 == 0))
+	if (abs(dist) < 16 && (step_delay < 18) && (dist%3 == 0))
 	step_delay++;
 	
 	//does the belt need to slow down?
