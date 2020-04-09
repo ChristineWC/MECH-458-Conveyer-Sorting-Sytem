@@ -4,6 +4,7 @@
 #include <util/delay_basic.h>
 #include <avr/interrupt.h>
 #include "lcd.h"
+#include "LL.h"
 
 //INCLUDE THE HEADER FILE FOR THE LIST
 
@@ -48,7 +49,7 @@ Item* DQ;
 
 //Linked list functions
 
-void setup(Item **h,Item **t){
+void setup(Item** h,Item** t){
 	*h = NULL;		
 	*t = NULL;		
 	return;
@@ -58,14 +59,14 @@ void setup(Item **h,Item **t){
 * DESC: This initializes a link and returns the pointer to the new link or NULL if error 
 * INPUT: the head and tail pointers by reference
 */
-void initLink(Item **newLink){
+void initLink(Item** newLink){
 	//link *l;
-	*newLink = malloc(sizeof(link));
+	*newLink = malloc(sizeof(Item));
 	(*newLink)->next = NULL;
 }
 
 /* push back */
-void enqueue(Item **h, Item **t, Item **nL){
+void enqueue(Item** h, Item** t, Item** nL){
 
 	if (*t != NULL){ //if not empty
 		(*t)->next = *nL;
@@ -77,46 +78,26 @@ void enqueue(Item **h, Item **t, Item **nL){
 	}
 }
 
-/**************************************************************************************
-* DESC : Removes the link from the head of the list and assigns it to deQueuedLink
-* INPUT: The head and tail pointers, and a ptr 'deQueuedLink' 
-* 		 which the removed link will be assigned to
-*/
-/* This will remove the link and element within the link from the head of the queue */
-void dequeue(Item **h, Item **deQueuedLink){
-	/*
-	if (*head != NULL){ //This means that the list is not empty then 
-		//need to check if there is only one thing in which case head and tail go to null 
-		// if there is more than one thing 
-		// random pointer that is equal to the head so you don't lose the location of the head
-		// then make the head equal to the heads next 
-		// then take the pointer 
-	}
-	*/
-	
+void dequeue(Item** h, Item** t, Item** deQueuedLink){
 	*deQueuedLink = *h;	// Will set to NULL if Head points to NULL
 	/* Ensure it is not an empty queue */
 	if (*h != NULL){
 		*h = (*h)->next;
 	}
+	if (*h == NULL){
+		*t = NULL;
+	}
 	
 }
 
-/**************************************************************************************
-* DESC: Peeks at the first element in the list
-* INPUT: The head pointer
-* RETURNS: The element contained within the queue
-*/
-/* This simply allows you to peek at the head element of the queue and returns a NULL pointer if empty */
-Material firstValue(Item **h){
+Material firstValue(Item** h){ //gives you back the material of the first item
 	return((*h)->mat);
 }
 
 
-/* This clears the queue */
-void clearQueue(Item **h, Item **t){
+void clearQueue(Item** h, Item** t){
 
-	Item *temp;
+	Item* temp;
 
 	while (*h != NULL){
 		temp = *h;
@@ -131,14 +112,14 @@ void clearQueue(Item **h, Item **t){
 }
 
 
-char isEmpty(Item **h){
+char isEmpty(Item** h){
 	/* ENTER YOUR CODE HERE */
 	return(*h == NULL);
 }
 
-int size(Item **h, Item **t){
+int size(Item** h, Item** t){
 
-	Item 	*temp;			
+	Item*   temp;			
 	int 	numElements;
 
 	numElements = 0;
@@ -284,7 +265,7 @@ ISR(INT3_vect){// EX/EOT sensor, it is hooked up to PORT D3
 		white_count++; 
 	}
 	
-	dequeue(&head, &DQ);
+	dequeue(&head, &tail, &DQ);
 	free(DQ);
 	
 	LCDClear();
@@ -317,7 +298,6 @@ int main(){
     DDRC = 0xff; // output for the LCD
     DDRA = 0xff; //output for stepper
     DDRF = 0x00; //input for RL sensor @ F1
-    List* list = new_list();
     
     InitLCD(LS_BLINK|LS_ULINE); //initialize LCD subsystem
     TCCR1B |=_BV(CS10); // we need this in main to use the timer
@@ -391,8 +371,8 @@ int main(){
 	}
 	*/
 	
-	Item 	*temp;			
-	temp = *h;			
+	Item* temp;			
+	temp = head;			
 	while(temp != NULL){
 	   if(temp->mat == STEEL){
 	     	pending_steel++; 
