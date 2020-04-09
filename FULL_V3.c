@@ -38,10 +38,9 @@ const int Bl_Min = 941;
 const int Wh_Max = 940;
 const int Wh_Min = 700;
 
-//Linked list global
 Item* head;		
 Item* tail;
-Item* newLink; 
+Item* newItem; 
 Item* DQ;
 
 
@@ -50,17 +49,11 @@ Item* DQ;
 void setup(Item** h,Item** t){
 	*h = NULL;		
 	*t = NULL;		
-	return;
 }
 
-/**************************************************************************************
-* DESC: This initializes a link and returns the pointer to the new link or NULL if error 
-* INPUT: the head and tail pointers by reference
-*/
-void initLink(Item** newLink){
-	//link *l;
-	*newLink = malloc(sizeof(Item));
-	(*newLink)->next = NULL;
+void initLink(Item** newItem){
+	*newItem = malloc(sizeof(Item));
+	(*newItem)->next = NULL;
 }
 
 /* push back */
@@ -76,7 +69,7 @@ void enqueue(Item** h, Item** t, Item** nL){
 	}
 }
 
-void dequeue(Item** h, Item** t, Item** deQueuedLink){
+void dequeue(Item** h, Item** t, Item** deQueuedItem){
 	*deQueuedLink = *h;	// Will set to NULL if Head points to NULL
 	/* Ensure it is not an empty queue */
 	if (*h != NULL){
@@ -111,7 +104,6 @@ void clearQueue(Item** h, Item** t){
 
 
 char isEmpty(Item** h){
-	/* ENTER YOUR CODE HERE */
 	return(*h == NULL);
 }
 
@@ -224,19 +216,19 @@ ISR(ADC_vect){ //ISR for reflective sensor when ADC conversion complete
 	LCDClear(); 
         
 	if(lowest <= Bl_Max && lowest >= Bl_Min){
-            newLink->mat = BLACK; 
+            newItem->mat = BLACK; 
 	    LCDWriteStringXY(0, 0, "PART: BLACK");
         }
         else if(lowest <= St_Max && lowest >= St_Min){
-            newLink->mat = STEEL; 
+            newItem->mat = STEEL; 
 	    LCDWriteStringXY(0, 0, "PART: STEEL");
         }
         else if(lowest <= Wh_Max && lowest >= Wh_Min){
-            newLink->mat = WHITE; 
+            newItem->mat = WHITE; 
 	    LCDWriteStringXY(0, 0, "PART: WHITE");
         }
         else if(lowest <= Al_Max && lowest >= Al_Min){
-            newLink->mat = ALUMINUM; 
+            newItem->mat = ALUMINUM; 
 	    LCDWriteStringXY(0, 0, "PART: ALUMINUM");
         }
     }
