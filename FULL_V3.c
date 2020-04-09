@@ -4,9 +4,7 @@
 #include <util/delay_basic.h>
 #include <avr/interrupt.h>
 #include "lcd.h"
-#include "LL.h"
-
-//INCLUDE THE HEADER FILE FOR THE LIST
+#include "LL.h" //header file for the linked list
 
 //Global variables
 volatile int current_state = 0;//state (running or paused)
