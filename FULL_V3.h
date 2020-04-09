@@ -1,5 +1,14 @@
 /* LinkedQueue.h */
 
+typedef enum
+{
+    BLACK    = 0,
+    STEEL    = 50,
+    WHITE    = 100,
+    ALUMINUM = 150
+} Material;
+
+
 /* Type definitions */
 typedef struct {
 	char itemCode; 	/* stores a number describing the element */
