@@ -2,9 +2,9 @@
 typedef enum
 {
 	BLACK    = 0,
-	STEEL    = 50,
+	STEEL    = 150,
 	WHITE    = 100,
-	ALUMINUM = 150
+	ALUMINUM = 50
 } Material;
 
 typedef struct item{
