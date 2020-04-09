@@ -13,11 +13,11 @@ typedef struct item{
 } Item;
 
 
-void	initLink	(Item** newLink);
+void	initLink	(Item** newItem);
 void 	setup		(Item** h, Item** t);
 void 	clearQueue	(Item** h, Item** t);
 void 	enqueue		(Item** h, Item** t, Item** nL);
-void 	dequeue		(Item** h, Item** t, Item** deQueuedLink);
+void 	dequeue		(Item** h, Item** t, Item** deQueuedItem);
 Material firstValue	(Item** h);
 char 	isEmpty		(Item** h);
 int 	size		(Item** h, Item** t);
