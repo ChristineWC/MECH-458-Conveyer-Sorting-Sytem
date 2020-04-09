@@ -70,7 +70,7 @@ void enqueue(Item** h, Item** t, Item** nL){
 }
 
 void dequeue(Item** h, Item** t, Item** deQueuedItem){
-	*deQueuedLink = *h;	// Will set to NULL if Head points to NULL
+	*deQueuedItem = *h;	// Will set to NULL if Head points to NULL
 	/* Ensure it is not an empty queue */
 	if (*h != NULL){
 		*h = (*h)->next;
@@ -212,7 +212,7 @@ ISR(ADC_vect){ //ISR for reflective sensor when ADC conversion complete
         ADCSRA |= _BV(ADSC); // Starts the conversion
     }
     else{
-	initLink(&newLink);
+	initLink(&newItem);
 	LCDClear(); 
         
 	if(lowest <= Bl_Max && lowest >= Bl_Min){
