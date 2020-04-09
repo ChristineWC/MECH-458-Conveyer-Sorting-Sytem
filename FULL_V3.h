@@ -19,7 +19,7 @@ void 	setup		(Item **h, Item **t);
 void 	clearQueue	(Item **h, Item **t);
 void 	enqueue		(Item **h, Item **t, Item **nL);
 void 	dequeue		(Item **h, Item **deQueuedLink);
-mat firstValue	(Item **h);
+Material firstValue	(Item **h);
 char 	isEmpty		(Item **h);
 int 	size		(Item **h, Item **t);
 
