@@ -40,7 +40,6 @@ const int Wh_Min = 700;
 
 Item* head;		
 Item* tail;
-Item* newItem; 
 Item* DQ;
 
 
@@ -212,24 +211,29 @@ ISR(ADC_vect){ //ISR for reflective sensor when ADC conversion complete
         ADCSRA |= _BV(ADSC); // Starts the conversion
     }
     else{
+	Item* newItem; 
 	initLink(&newItem);
 	LCDClear(); 
         
 	if(lowest <= Bl_Max && lowest >= Bl_Min){
-            newItem->mat = BLACK; 
-	    LCDWriteStringXY(0, 0, "PART: BLACK");
+			newItem->mat = BLACK; 
+			enqueue(&head,&tail,&newItem);
+			LCDWriteStringXY(0, 0, "PART: BLACK");
         }
         else if(lowest <= St_Max && lowest >= St_Min){
-            newItem->mat = STEEL; 
-	    LCDWriteStringXY(0, 0, "PART: STEEL");
+			newItem->mat = STEEL; 
+			enqueue(&head,&tail,&newItem);
+			LCDWriteStringXY(0, 0, "PART: STEEL");
         }
         else if(lowest <= Wh_Max && lowest >= Wh_Min){
             newItem->mat = WHITE; 
-	    LCDWriteStringXY(0, 0, "PART: WHITE");
+			enqueue(&head,&tail,&newItem);
+			LCDWriteStringXY(0, 0, "PART: WHITE");
         }
         else if(lowest <= Al_Max && lowest >= Al_Min){
             newItem->mat = ALUMINUM; 
-	    LCDWriteStringXY(0, 0, "PART: ALUMINUM");
+			enqueue(&head,&tail,&newItem);
+			LCDWriteStringXY(0, 0, "PART: ALUMINUM");
         }
     }
 	LCDWriteStringXY(0, 1, "PART PENDING");
