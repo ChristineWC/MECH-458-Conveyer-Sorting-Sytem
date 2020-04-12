@@ -323,7 +323,11 @@ int main(){
 	PORTB = 0b00000010;//turns on DC motor forward (CCW)    
 	
 	//Here we're gonna do some fucked shit to try to make this thing SMART
-		
+	LCDClear();
+	LCDWriteIntXY(0,0, firstValue(&head), 3); 
+	mTimer(5000); 
+	LCDClear();
+	
 	if(((firstValue(&head)) != current_pos) && (head != NULL)){ //is the stepper/bucket ready to receive the next item?
 		step_what();//sets distance to go, and adjusts the step delay/stepper speed, and slows down belt if necessary
 		StepperGo();
