@@ -195,7 +195,7 @@ void step_what(){ //sets the distance and speed
 	
 	//does the belt need to slow down?
 	if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor
-	OCR0A = 0x40; //sets duty cycle 
+	OCR0A = 0b01000000; //sets duty cycle 
 
 }
 
