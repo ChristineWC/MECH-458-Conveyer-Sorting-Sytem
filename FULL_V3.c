@@ -193,10 +193,6 @@ void step_what(){ //sets the distance and speed
 	if (abs(dist) < 16 && (step_delay < 18) && (dist%3 == 0))
 	step_delay++;
 	
-	//does the belt need to slow down?
-	if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor
-	OCR0A = 0b01000000; //sets duty cycle 
-
 }
 
 //ISRs
@@ -237,8 +233,6 @@ ISR(ADC_vect){ //ISR for reflective sensor when ADC conversion complete
         }
     }
 	LCDWriteStringXY(0, 1, "PART PENDING");
-	mTimer(5000);
-	LCDClear();
 }
 
 ISR(INT2_vect){ // OR sensor
@@ -266,8 +260,6 @@ ISR(INT3_vect){// EX/EOT sensor, it is hooked up to PORT D3
 	
 	LCDClear();
 	LCDWriteStringXY(0, 0, "PART SORTED");
-	mTimer(5000); 
-	LCDClear(); 
     /*
     if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor 
     if((PIND &= 0x08) == 0x00)// this means that there is nothing in front of the exit sensor
@@ -320,7 +312,6 @@ int main(){
   
   RUNNING:
 	  //output to lcd that it's running normally
-	PORTB = 0b00000010;//turns on DC motor forward (CCW)    
 	
 	//Here we're gonna do some fucked shit to try to make this thing SMART
 	/*
@@ -331,12 +322,14 @@ int main(){
 	*/
 	
 	if(((firstValue(&head)) != current_pos) && (head != NULL)){ //is the stepper/bucket ready to receive the next item?
+		if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor
+			PORTB = 0b00000000; //turns off belt
 		step_what();//sets distance to go, and adjusts the step delay/stepper speed, and slows down belt if necessary
 		StepperGo();
 		
 	} else { // YES, in position
 		step_delay = 18;
-		OCR0A = 0b10000000; //sets duty cycle to 1/2 to speed belt back up after bucket aligned
+		PORTB = 0b00000010; //sets duty cycle to 1/2 to speed belt back up after bucket aligned
 	}
 	  switch(current_state){
 	  	case(0):
