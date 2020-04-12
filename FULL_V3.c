@@ -159,7 +159,7 @@ void init_int() {//enables all necessary interrupts
 void PWM (){
     TCCR0A |= 0b10000011; //first bit sets compare match output mode to clear, last two set whole thing to mode 3 (table 13-7)
     TCCR0B |= 0b00000010; //sets clock prescale to 1/8 (Page 114)
-    OCR0A |= 0b10000000; //sets duty cycle to 1/2 
+    OCR0A = 0x40; //sets duty cycle
 }
 
 
