@@ -195,7 +195,7 @@ void step_what(){ //sets the distance and speed
 	
 	//does the belt need to slow down?
 	if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor
-	OCR0A |= 0b01000000; //sets duty cycle to 1/4 to slow down belt and allow bucket to prep
+	OCR0A = 0x40; //sets duty cycle 
 
 }
 
@@ -237,6 +237,8 @@ ISR(ADC_vect){ //ISR for reflective sensor when ADC conversion complete
         }
     }
 	LCDWriteStringXY(0, 1, "PART PENDING");
+	mTimer(5000);
+	LCDClear();
 }
 
 ISR(INT2_vect){ // OR sensor
@@ -264,6 +266,8 @@ ISR(INT3_vect){// EX/EOT sensor, it is hooked up to PORT D3
 	
 	LCDClear();
 	LCDWriteStringXY(0, 0, "PART SORTED");
+	mTimer(5000); 
+	LCDClear(); 
     /*
     if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor 
     if((PIND &= 0x08) == 0x00)// this means that there is nothing in front of the exit sensor
@@ -326,8 +330,7 @@ int main(){
 		
 	} else { // YES, in position
 		step_delay = 18;
-		OCR0A |= 0b10000000; //sets duty cycle to 1/2 to speed belt back up after bucket aligned
-
+		OCR0A = 0b10000000; //sets duty cycle to 1/2 to speed belt back up after bucket aligned
 	}
 	  switch(current_state){
 	  	case(0):
@@ -385,9 +388,15 @@ int main(){
 	LCDWriteStringXY(0, 0, "BL: WH: ST: AL: ");
 	LCDWriteStringXY(0, 1, "S   S   S   S   S   ");
 	LCDWriteIntXY(1,1,black_count, 2);
+	LCDWriteIntXY(5,1,white_count, 2);
+	LCDWriteIntXY(9,1,steel_count, 2);
+	LCDWriteIntXY(13,1,aluminum_count, 2);
+	/*
+	LCDWriteIntXY(1,1,black_count, 2);
 	LCDWriteIntXY(1,5,white_count, 2);
 	LCDWriteIntXY(1,9,steel_count, 2);
 	LCDWriteIntXY(1,13,aluminum_count, 2);
+	*/
 	for(int i = 0; i < 100; i++){
 			mTimer(30);
 			if(current_state == 0)
@@ -398,9 +407,15 @@ int main(){
 	LCDWriteStringXY(0, 0, "BL: WH: ST: AL: ");
 	LCDWriteStringXY(0, 1, "P   P   P   P   P   ");
 	LCDWriteIntXY(1,1,pending_black, 2);
+	LCDWriteIntXY(5,1,pending_white, 2);
+	LCDWriteIntXY(9,1,pending_steel, 2);
+	LCDWriteIntXY(13,1,pending_aluminum, 2);
+	/*
+	LCDWriteIntXY(1,1,pending_black, 2);
 	LCDWriteIntXY(1,5,pending_white, 2);
 	LCDWriteIntXY(1,9,pending_steel, 2);
 	LCDWriteIntXY(1,13,pending_aluminum, 2);
+	*/
 	for(int i = 0; i < 100; i++){
 		mTimer(30);
 		if(current_state == 0)
