@@ -384,12 +384,7 @@ int main(){
 	LCDWriteIntXY(5,1,white_count, 2);
 	LCDWriteIntXY(9,1,steel_count, 2);
 	LCDWriteIntXY(13,1,aluminum_count, 2);
-	/*
-	LCDWriteIntXY(1,1,black_count, 2);
-	LCDWriteIntXY(1,5,white_count, 2);
-	LCDWriteIntXY(1,9,steel_count, 2);
-	LCDWriteIntXY(1,13,aluminum_count, 2);
-	*/
+	
 	for(int i = 0; i < 100; i++){
 			mTimer(30);
 			if(current_state == 0)
@@ -403,12 +398,7 @@ int main(){
 	LCDWriteIntXY(5,1,pending_white, 2);
 	LCDWriteIntXY(9,1,pending_steel, 2);
 	LCDWriteIntXY(13,1,pending_aluminum, 2);
-	/*
-	LCDWriteIntXY(1,1,pending_black, 2);
-	LCDWriteIntXY(1,5,pending_white, 2);
-	LCDWriteIntXY(1,9,pending_steel, 2);
-	LCDWriteIntXY(1,13,pending_aluminum, 2);
-	*/
+	
 	for(int i = 0; i < 100; i++){
 		mTimer(30);
 		if(current_state == 0)
