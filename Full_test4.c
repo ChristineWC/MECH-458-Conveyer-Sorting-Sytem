@@ -4,7 +4,7 @@
 #include <util/delay_basic.h>
 #include <avr/interrupt.h>
 #include "lcd.h"
-#include "LL.h" //header file for the linked list
+//#include "LL.h" //header file for the linked list
 
 //Global variables
 volatile int current_state = 0;//state (running or paused)
@@ -131,22 +131,16 @@ void set_item(int mat){
 
 	    
 int get_next(){
-	if (next == 1)
+	if (next_up == 1)
 		return mat1;
-	if (next == 2)
+	if (next_up == 2)
 		return mat2;
-	if (next == 3)
+	if (next_up == 3)
 		return mat3;	
-	if (next == 4)
+	if (next_up == 4)
 		return mat4;
 }
 	    
-void dump_item(){
-	int num = (pending_black + pending_white + pending_steel + pending_aluminum);
-	if (num == 1)
-		
-	
-}
 
 //ISRs
 
@@ -213,9 +207,9 @@ ISR(INT3_vect){// EX/EOT sensor, it is hooked up to PORT D3
 		pending_white--;
 	}
 	
-	next++;
-	if (next > 4)
-		next = 1;
+	next_up++;
+	if (next_up > 4)
+		next_up = 1;
 	
 	LCDClear();
 	LCDWriteStringXY(0, 0, "PART SORTED");
