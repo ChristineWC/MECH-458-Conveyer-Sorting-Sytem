@@ -74,7 +74,7 @@ void init_int() {//enables all necessary interrupts
     EICRA |= _BV(ISC01);   // Falling Edge on INT0 for hall sensor
     EIMSK |= _BV(INT0);    // Enable INT0 for hall sensor
     EIMSK |= _BV(INT3); //Enable INT3 for EOT sensor	
-    EICRA |= _BV(ISC31); // falling edge interrupt for EOT sensor
+    EICRA |= _BV(ISC31) | _BV(ISC30); // RISING edge interrupt for EOT sensor
     EIMSK |= _BV(INT1); // Enable INT1 for the pause button
     EICRA |= (_BV(ISC11) | _BV(ISC10)); // rising edge interrupt for pause button
 }
@@ -268,7 +268,7 @@ int main(){
 	//Here we're gonna do some fucked shit to try to make this thing SMART
 	
 	if(( get_next() ) != current_pos){ //is the stepper/bucket ready to receive the next item?
-		if((PIND & 0x08) == 0x08)// this means that there is something in front of the exit sensor
+		if((PIND & 0x08) == 0x00)// this means that there is something in front of the exit sensor
 			PORTB = 0b00000000; //turns off belt
 		step_what();//sets distance to go, and adjusts the step delay/stepper speed, and slows down belt if necessary
 		StepperGo();
