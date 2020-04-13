@@ -261,8 +261,8 @@ ISR(INT3_vect){// EX/EOT sensor, it is hooked up to PORT D3
 	LCDClear();
 	LCDWriteStringXY(0, 0, "PART SORTED");
     /*
-    if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor 
-    if((PIND &= 0x08) == 0x00)// this means that there is nothing in front of the exit sensor
+    if((PIND & 0x08) == 0x08)// this means that there is something in front of the exit sensor 
+    if((PIND & 0x08) == 0x00)// this means that there is nothing in front of the exit sensor
     */
 }
 
@@ -316,7 +316,7 @@ int main(){
 	//Here we're gonna do some fucked shit to try to make this thing SMART
 	
 	if(((firstValue(&head)) != current_pos) && (head != NULL)){ //is the stepper/bucket ready to receive the next item?
-		if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor
+		if((PIND & 0x08) == 0x08)// this means that there is something in front of the exit sensor
 			PORTB = 0b00000000; //turns off belt
 		step_what();//sets distance to go, and adjusts the step delay/stepper speed, and slows down belt if necessary
 		StepperGo();
