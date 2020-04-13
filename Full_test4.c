@@ -102,8 +102,8 @@ void StepperGo(){
 	mTimer(step_delay);	
 }
 
-void step_what(int mat){ //sets the distance and speed
-	dist = ((mat) - current_pos);
+void step_what(){ //sets the distance and speed
+	dist = ( (get_next() ) - current_pos);
 	if (dist >= 100)
 	dist = dist - 200;
 	if (dist < -100)
@@ -127,12 +127,18 @@ void set_item(int mat){
 		mat3 = mat;
 	if ((mat_count == 4)
 		mat4 = mat;
-	
 }
 
 	    
 int get_next(){
-	return(pending_black + pending_white + pending_steel + pending_aluminum);
+	if (next == 1)
+		return mat1;
+	if (next == 2)
+		return mat2;
+	if (next == 3)
+		return mat3;	
+	if (next == 4)
+		return mat4;
 }
 	    
 void dump_item(){
@@ -190,25 +196,26 @@ ISR(INT2_vect){ // OR sensor
 
 ISR(INT3_vect){// EX/EOT sensor, it is hooked up to PORT D3
 	
-	if(head->mat == STEEL){
+	if(get_next() == 150){
 		steel_count++;
 		pending_steel--;
 	}
-	else if(head->mat == ALUMINUM){
+	else if(get_next() == 50){
 		aluminum_count++;	
 		pending_aluminum--;
 	}
-	else if(head->mat == BLACK){
+	else if(get_next() == 0){
 		black_count++;
 		pending_black--;
 	}
-	else if(head->mat == WHITE){
+	else if(get_next() == 100){
 		white_count++; 
 		pending_white--;
 	}
 	
-	dequeue(&head, &tail, &DQ);
-	free(DQ);
+	next++;
+	if (next > 4)
+		next = 1;
 	
 	LCDClear();
 	LCDWriteStringXY(0, 0, "PART SORTED");
@@ -246,8 +253,6 @@ int main(){
     init_int(); //initializes all interrupts
     PWM(); //Though the duty cycle may need to be changed for the DC motor
     sei(); // sets the Global Enable for all interrupts
-    setup(&head, &tail); 
-
 	
 //initialize the stepper to get it to the starting position
 	LCDWriteStringXY(0, 0, "Homing Start");
@@ -267,7 +272,7 @@ int main(){
 	
 	//Here we're gonna do some fucked shit to try to make this thing SMART
 	
-	if(((firstValue(&head)) != current_pos) && (head != NULL)){ //is the stepper/bucket ready to receive the next item?
+	if((( get_next() ) != current_pos) && (head != NULL)){ //is the stepper/bucket ready to receive the next item?
 		if((PIND & 0x08) == 0x08)// this means that there is something in front of the exit sensor
 			PORTB = 0b00000000; //turns off belt
 		step_what();//sets distance to go, and adjusts the step delay/stepper speed, and slows down belt if necessary
@@ -293,23 +298,6 @@ int main(){
 	step_delay = 17; //returns the step delay to a reasonable speed, in case it was paused in the bucket stage
 	//might need a small loop here that ramps down the bucket in case it's going full tilt
 	
-	Item* temp;			
-	temp = head;			
-	while(temp != NULL){
-	   if(temp->mat == STEEL){
-	     	pending_steel++; 
-	    }
-	    else if(temp->mat == ALUMINUM){
-	     	pending_aluminum++; 
-	    }
-	    else if(temp->mat == BLACK){
-	     	pending_black++; 
-	     } 
-	     else if(temp->mat == WHITE){
-	     	pending_white++; 
-	     }
-		temp = temp->next;
-	}
 	
 	//LCD displays number of sorted and pending items
 	LCDWriteStringXY(2, 0, "SYSTEM PAUSE");
