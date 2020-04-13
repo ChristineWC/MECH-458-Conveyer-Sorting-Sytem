@@ -102,8 +102,21 @@ void StepperGo(){
 	mTimer(step_delay);	
 }
 
+int get_next(){
+	if (next_up == 1)
+	return mat1;
+	if (next_up == 2)
+	return mat2;
+	if (next_up == 3)
+	return mat3;
+	if (next_up == 4)
+	return mat4;
+	else
+	return 0;
+}
+
 void step_what(){ //sets the distance and speed
-	dist = ( (get_next() ) - current_pos);
+	dist = ( (get_next()) - current_pos);
 	if (dist >= 100)
 	dist = dist - 200;
 	if (dist < -100)
@@ -119,26 +132,14 @@ void step_what(){ //sets the distance and speed
 }
 
 void set_item(int mat){
-	if ((mat_count == 1)
+	if (mat_count == 1)
 		mat1 = mat;
-	if ((mat_count == 2)
+	if (mat_count == 2)
 		mat2 = mat;
-	if ((mat_count == 3)
+	if (mat_count == 3)
 		mat3 = mat;
-	if ((mat_count == 4)
+	if (mat_count == 4)
 		mat4 = mat;
-}
-
-	    
-int get_next(){
-	if (next_up == 1)
-		return mat1;
-	if (next_up == 2)
-		return mat2;
-	if (next_up == 3)
-		return mat3;	
-	if (next_up == 4)
-		return mat4;
 }
 	    
 
@@ -266,7 +267,7 @@ int main(){
 	
 	//Here we're gonna do some fucked shit to try to make this thing SMART
 	
-	if((( get_next() ) != current_pos) && (head != NULL)){ //is the stepper/bucket ready to receive the next item?
+	if(( get_next() ) != current_pos){ //is the stepper/bucket ready to receive the next item?
 		if((PIND & 0x08) == 0x08)// this means that there is something in front of the exit sensor
 			PORTB = 0b00000000; //turns off belt
 		step_what();//sets distance to go, and adjusts the step delay/stepper speed, and slows down belt if necessary
