@@ -74,14 +74,14 @@ void dequeue(Item** h, Item** t, Item** deQueuedItem){
 	if (*h != NULL){
 		*h = (*h)->next;
 	}
-	else if (*h == NULL){
+	else if (*h == NULL){ //why is this here?
 		*t = NULL;
 	}
 	
 }
 
 Material firstValue(Item** h){ //gives you back the material of the first item
-	return((*h)->mat);
+	return((*h)->mat); // sketchy here maybe...what if *h = NULL
 }
 
 
