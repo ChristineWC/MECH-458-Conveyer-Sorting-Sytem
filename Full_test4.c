@@ -14,6 +14,13 @@ volatile int step_delay = 18; //global variable for i5s speed .
 volatile int dir = 1; //this should be either +1 or -1, set in step_what() to give direction for bucket
 volatile int dist = 0; //holds absolute value of # of steps to get where needs to go
 
+int mat1 = 0;
+int mat2 = 0;
+int mat3 = 0;
+int mat4 = 0;
+int mat_count = 0;
+int next_up = 1;
+
 int steel_count = 0; 
 int aluminum_count = 0; 
 int black_count = 0; 
@@ -38,90 +45,6 @@ const int Bl_Min = 946;
 const int Wh_Max = 945;
 const int Wh_Min = 700;
 
-Item* head;		
-Item* tail;
-Item* DQ;
-
-
-//Linked list functions
-
-void setup(Item** h,Item** t){
-	*h = NULL;		
-	*t = NULL;		
-}
-
-void initLink(Item** newItem){
-	*newItem = malloc(sizeof(Item));
-	(*newItem)->next = NULL;
-}
-
-/* push back */
-void enqueue(Item** h, Item** t, Item** nL){
-
-	if (*t != NULL){ //if not empty
-		(*t)->next = *nL;
-		*t = *nL; //(*t)->next;
-	}
-	else{ // if empty 
-		*h = *nL;
-		*t = *nL;
-	}
-}
-
-void dequeue(Item** h, Item** t, Item** deQueuedItem){
-	*deQueuedItem = *h;	// Will set to NULL if Head points to NULL
-	/* Ensure it is not an empty queue */
-	if (*h != NULL){
-		*h = (*h)->next;
-	}
-	else if (*h == NULL){ //why is this here?
-		*t = NULL;
-	}
-	
-}
-
-Material firstValue(Item** h){ //gives you back the material of the first item
-	return((*h)->mat); // sketchy here maybe...what if *h = NULL
-}
-
-
-void clearQueue(Item** h, Item** t){
-
-	Item* temp;
-
-	while (*h != NULL){
-		temp = *h;
-		*h=(*h)->next;
-		free(temp);
-	}
-	
-	/* Last but not least set the tail to NULL */
-	*t = NULL;		
-
-	return;
-}
-
-
-char isEmpty(Item** h){
-	return(*h == NULL);
-}
-
-int size(Item** h, Item** t){
-
-	Item*   temp;			
-	int 	numElements;
-
-	numElements = 0;
-
-	temp = *h;			/* point to the first item in the list */
-
-	while(temp != NULL){
-		numElements++;
-		temp = temp->next;
-	}/*while*/
-	
-	return(numElements);
-}
 
 //Functions 
 void mTimer(int count){
@@ -179,8 +102,8 @@ void StepperGo(){
 	mTimer(step_delay);	
 }
 
-void step_what(){ //sets the distance and speed
-	dist = ((firstValue(&head)) - current_pos);
+void step_what(int mat){ //sets the distance and speed
+	dist = ((mat) - current_pos);
 	if (dist >= 100)
 	dist = dist - 200;
 	if (dist < -100)
@@ -192,6 +115,30 @@ void step_what(){ //sets the distance and speed
 	step_delay--;
 	if (abs(dist) < 16 && (step_delay < 18) && (dist%3 == 0))
 	step_delay++;
+	
+}
+
+void set_item(int mat){
+	if ((mat_count == 1)
+		mat1 = mat;
+	if ((mat_count == 2)
+		mat2 = mat;
+	if ((mat_count == 3)
+		mat3 = mat;
+	if ((mat_count == 4)
+		mat4 = mat;
+	
+}
+
+	    
+int get_next(){
+	return(pending_black + pending_white + pending_steel + pending_aluminum);
+}
+	    
+void dump_item(){
+	int num = (pending_black + pending_white + pending_steel + pending_aluminum);
+	if (num == 1)
+		
 	
 }
 
@@ -207,29 +154,30 @@ ISR(ADC_vect){ //ISR for reflective sensor when ADC conversion complete
         ADCSRA |= _BV(ADSC); // Starts the conversion
     }
     else{
-	Item* newItem; 
-	initLink(&newItem);
 	LCDClear(); 
-        
+        mat_count++;
+	if (mat_count > 4)
+		mat_count = 1;
+	    
 	if(lowest <= Bl_Max && lowest >= Bl_Min){
-			newItem->mat = BLACK; 
-			enqueue(&head,&tail,&newItem);
-			LCDWriteStringXY(0, 0, "PART: BLACK");
+		set_item(0);
+		pending_black++;
+		LCDWriteStringXY(0, 0, "PART: BLACK");
         }
         else if(lowest <= St_Max && lowest >= St_Min){
-			newItem->mat = STEEL; 
-			enqueue(&head,&tail,&newItem);
-			LCDWriteStringXY(0, 0, "PART: STEEL");
+		set_item(150);
+		pending_steel++;
+		LCDWriteStringXY(0, 0, "PART: STEEL");
         }
         else if(lowest <= Wh_Max && lowest >= Wh_Min){
-            newItem->mat = WHITE; 
-			enqueue(&head,&tail,&newItem);
-			LCDWriteStringXY(0, 0, "PART: WHITE");
+            	set_item(100);
+		pending_white++;
+		LCDWriteStringXY(0, 0, "PART: WHITE");
         }
         else if(lowest <= Al_Max && lowest >= Al_Min){
-            newItem->mat = ALUMINUM; 
-			enqueue(&head,&tail,&newItem);
-			LCDWriteStringXY(0, 0, "PART: ALUMINUM");
+ 		set_item(50);
+		pending_aluminum++;
+		LCDWriteStringXY(0, 0, "PART: ALUMINUM");
         }
     }
 	LCDWriteStringXY(0, 1, "PART PENDING");
@@ -244,15 +192,19 @@ ISR(INT3_vect){// EX/EOT sensor, it is hooked up to PORT D3
 	
 	if(head->mat == STEEL){
 		steel_count++;
+		pending_steel--;
 	}
 	else if(head->mat == ALUMINUM){
 		aluminum_count++;	
+		pending_aluminum--;
 	}
 	else if(head->mat == BLACK){
-		black_count++;	
+		black_count++;
+		pending_black--;
 	}
 	else if(head->mat == WHITE){
 		white_count++; 
+		pending_white--;
 	}
 	
 	dequeue(&head, &tail, &DQ);
