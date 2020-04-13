@@ -314,12 +314,6 @@ int main(){
 	  //output to lcd that it's running normally
 	
 	//Here we're gonna do some fucked shit to try to make this thing SMART
-	/*
-	LCDClear();
-	LCDWriteIntXY(0,0, firstValue(&head), 3); 
-	mTimer(5000); 
-	LCDClear();
-	*/
 	
 	if(((firstValue(&head)) != current_pos) && (head != NULL)){ //is the stepper/bucket ready to receive the next item?
 		if((PIND &= 0x08) == 0x08)// this means that there is something in front of the exit sensor
