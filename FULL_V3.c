@@ -34,8 +34,8 @@ const int Al_Min = 0;
 const int St_Max = 699;
 const int St_Min = 351;
 const int Bl_Max = 1023;
-const int Bl_Min = 941;
-const int Wh_Max = 940;
+const int Bl_Min = 946;
+const int Wh_Max = 945;
 const int Wh_Min = 700;
 
 Item* head;		
