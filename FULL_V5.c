@@ -75,7 +75,7 @@ void dequeue(Item** h, Item** t, Item** deQueuedItem){
 	if (*h != NULL){
 		*h = (*h)->next;
 	}
-	else if (*h == NULL){ //why is this here?
+	if (*h == NULL){ //why is this here?
 		*t = NULL;
 	}
 	
