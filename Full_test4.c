@@ -31,7 +31,7 @@ int pending_aluminum = 0;
 int pending_black = 0;
 int pending_white = 0;
 
-int spin[4] = {0b00110000, 0b00000110, 0b00101000, 0b00000101};
+int spin[4] = {0b00110110, 0b00101110, 0b00101101, 0b00110101};
 
 unsigned int lowest;
 int ADC_resultflag = 0; 
@@ -124,7 +124,7 @@ void step_what(){ //sets the distance and speed
 	dir = (dist)/ abs(dist);
 
 	//how far to go? set "acc_or_dec" based on current distance and step_delay
-	if (abs(dist) > 20 && (step_delay > 9) && (dist%3 == 0))
+	if (abs(dist) > 20 && (step_delay > 11) && (dist%3 == 0))
 	step_delay--;
 	if (abs(dist) < 16 && (step_delay < 18) && (dist%3 == 0))
 	step_delay++;
