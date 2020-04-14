@@ -295,7 +295,7 @@ int main(){
   goto RUNNING;
   
   RUNNING:
-	 
+	PORTB = 0b00000010; //turns on belt
 	while(Sort_flag == 1){
 	      PORTB = 0b00000000; //turns off belt	
 	      if(((firstValue(&head)) != current_pos) && (head != NULL)){ //is the stepper/bucket ready to receive the next item?
@@ -304,7 +304,6 @@ int main(){
 	      }	      
               if((firstValue(&head)) == current_pos) && (head != NULL)){
 		step_delay = 18;
-		PORTB = 0b00000010; //turns on belt
 		      if(head->mat == STEEL){
 				steel_count++;
 			}
