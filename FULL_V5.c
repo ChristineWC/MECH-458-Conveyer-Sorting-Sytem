@@ -320,9 +320,10 @@ int main(){
 
 			dequeue(&head, &tail, &DQ);
 			free(DQ);
+		        Sort_flag = 0; 
 	    }
 		
-		Sort_flag = 0; 
+		
 	}
 	  switch(current_state){
 	  	case(0):
