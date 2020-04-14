@@ -28,6 +28,7 @@ int spin[4] = {0b00110000, 0b00000110, 0b00101000, 0b00000101};
 
 unsigned int lowest;
 int ADC_resultflag = 0; 
+int Sort_flag = 0; 
 
 const int Al_Max = 350;
 const int Al_Min = 0; 
@@ -242,24 +243,7 @@ ISR(INT2_vect){ // OR sensor
 
 ISR(INT3_vect){// EX/EOT sensor, it is hooked up to PORT D3
 	
-	if(head->mat == STEEL){
-		steel_count++;
-	}
-	else if(head->mat == ALUMINUM){
-		aluminum_count++;	
-	}
-	else if(head->mat == BLACK){
-		black_count++;	
-	}
-	else if(head->mat == WHITE){
-		white_count++; 
-	}
-	
-	dequeue(&head, &tail, &DQ);
-	free(DQ);
-	
-	LCDClear();
-	LCDWriteStringXY(0, 0, "PART SORTED");
+	Sort_flag = 1; 
     /*
     if((PIND & 0x08) == 0x08)// this means that there is something in front of the exit sensor 
     if((PIND & 0x08) == 0x00)// this means that there is nothing in front of the exit sensor
@@ -311,19 +295,34 @@ int main(){
   goto RUNNING;
   
   RUNNING:
-	  //output to lcd that it's running normally
-	
-	//Here we're gonna do some fucked shit to try to make this thing SMART
-	
-	if(((firstValue(&head)) != current_pos) && (head != NULL)){ //is the stepper/bucket ready to receive the next item?
-		if((PIND & 0x08) == 0x00)// this means that there is something in front of the exit sensor
-			PORTB = 0b00000000; //turns off belt
+	 
+	while(Sort_flag != 1){
+	      PORTB = 0b00000000; //turns off belt	
+	      if(((firstValue(&head)) != current_pos) && (head != NULL)){ //is the stepper/bucket ready to receive the next item?
 		step_what();//sets distance to go, and adjusts the step delay/stepper speed, and slows down belt if necessary
 		StepperGo();
-		
-	} else { // YES, in position
+	      }	      
+              if((firstValue(&head)) == current_pos) && (head != NULL)){
 		step_delay = 18;
-		PORTB = 0b00000010; //sets duty cycle to 1/2 to speed belt back up after bucket aligned
+		PORTB = 0b00000010; //turns on belt
+		      if(head->mat == STEEL){
+				steel_count++;
+			}
+			else if(head->mat == ALUMINUM){
+				aluminum_count++;	
+			}
+			else if(head->mat == BLACK){
+				black_count++;	
+			}
+			else if(head->mat == WHITE){
+				white_count++; 
+			}
+
+			dequeue(&head, &tail, &DQ);
+			free(DQ);
+	    }
+		
+		Sort_flag = 0; 
 	}
 	  switch(current_state){
 	  	case(0):
