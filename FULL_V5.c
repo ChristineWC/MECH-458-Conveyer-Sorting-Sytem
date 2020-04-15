@@ -19,11 +19,6 @@ int aluminum_count = 0;
 int black_count = 0; 
 int white_count = 0; 
 
-int pending_steel = 0;
-int pending_aluminum = 0;
-int pending_black = 0;
-int pending_white = 0;
-
 int spin[4] = {0b00110110, 0b00101110, 0b00101101, 0b00110101};
 
 unsigned int lowest;
@@ -339,6 +334,11 @@ int main(){
 	PORTB = 0b00000000;	//DC motor STOP
 	step_delay = 17; //returns the step delay to a reasonable speed, in case it was paused in the bucket stage
 	//might need a small loop here that ramps down the bucket in case it's going full tilt
+	
+	int pending_steel = 0;
+	int pending_aluminum = 0;
+	int pending_black = 0;
+	int pending_white = 0;
 	
 	Item* temp;			
 	temp = head;			
