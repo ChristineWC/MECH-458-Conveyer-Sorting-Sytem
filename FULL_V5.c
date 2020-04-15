@@ -298,7 +298,7 @@ int main(){
 	PORTB = 0b00000010; //turns on belt
 	while(Sort_flag == 1){
 	      PORTB = 0b00000000; //turns off belt	
-	      if(((firstValue(&head)) != current_pos) && (size(&head, &tail) != 0){ //is the stepper/bucket ready to receive the next item?
+	      if(((firstValue(&head)) != current_pos) && (head != NULL)){ //is the stepper/bucket ready to receive the next item?
 		step_what();//sets distance to go, and adjusts the step delay/stepper speed, and slows down belt if necessary
 		StepperGo();
 	      }	      
