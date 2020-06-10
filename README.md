@@ -1,4 +1,4 @@
-# MECH-458-Conveyer-Sorting-Sytem
+# Mechatronics(MECH-458)-Conveyer-Sorting-Sytem
 
 The primary objective of the project was to accurately sort objects of different materials by controlling the various sensors and motors making up the conveyor sorting mechanism. 
 
